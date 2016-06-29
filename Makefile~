@@ -1,4 +1,4 @@
-CONTIKI = ../..
+CONTIKI = ../../..
 ifndef TARGET
 TARGET=sky
 endif
