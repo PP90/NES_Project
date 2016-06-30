@@ -32,7 +32,7 @@ PROCESS_THREAD(myProcess, ev, data)
 		printf("Light: %d\n", light_sensor.value(0));
 		printf("Temp: %d\n",sht11_sensor.value(SHT11_SENSOR_TEMP));
       		printf("Hum: %d\n",sht11_sensor.value(SHT11_SENSOR_HUMIDITY));
-		printf("Total consumed: %d\n",  total_energy_consumed());
+		printf("Total consumed: %u\n",  total_energy_consumed());
 		SENSORS_DEACTIVATE(sht11_sensor);
 		SENSORS_DEACTIVATE(light_sensor);
 		leds_toggle(LEDS_ALL);

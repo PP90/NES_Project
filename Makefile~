@@ -3,7 +3,7 @@ ifndef TARGET
 TARGET=sky
 endif
 
-all: periodicMeasurmentTelosB
+all: periodic-sensing-telosb energy-data-structure
 
 %.tgz: %.ihex
 	mkdir $(basename $<) ; \

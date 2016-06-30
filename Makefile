@@ -3,8 +3,8 @@ ifndef TARGET
 TARGET=sky
 endif
 
-all: periodic-sensing-telosb energy-data-structure
-
+all: periodic-sensing-telosb energy-data-structure test-ds1000
+ 
 %.tgz: %.ihex
 	mkdir $(basename $<) ; \
 	mv $< $(basename $<) ; \

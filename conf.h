@@ -2,5 +2,6 @@
 #define CONFIGURATION_PARAMETER_H 12345
 
 #define HOW_OFTEN 4
+#define HOW_OFTEN_POLLUTION 30
 
 #endif
