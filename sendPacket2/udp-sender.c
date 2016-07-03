@@ -1,5 +1,29 @@
 /*
-
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the Institute nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * This file is part of the Contiki operating system.
  *
  */
 
@@ -9,6 +33,11 @@
 #include "net/ip/uip-udp-packet.h"
 #include "net/rpl/rpl.h"
 #include "dev/serial-line.h"
+#if CONTIKI_TARGET_Z1
+#include "dev/uart0.h"
+#else
+#include "dev/uart1.h"
+#endif
 #include "collect-common.h"
 #include "collect-view.h"
 
@@ -60,7 +89,7 @@ static void
 tcpip_handler(void)
 {
   if(uip_newdata()) {
-   	printf("New data is coming. To be handle\n");
+    /* Ignore incoming data */
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -73,6 +102,14 @@ collect_common_send(void)
     uint8_t for_alignment;
     struct collect_view_data_msg msg;
   } msg;
+
+struct{
+uint8_t pippo;
+ uint8_t for_alignment;
+} myMsg;
+
+myMsg.pippo=100;
+
   /* struct collect_neighbor *n; */
   uint16_t parent_etx;
   uint16_t rtmetric;
@@ -125,6 +162,17 @@ collect_common_send(void)
                                  parent_etx, rtmetric,
                                  num_neighbors, beacon_interval);
 
+	msg.msg.sensors[0]=100;
+	msg.msg.sensors[1]=200;
+	msg.msg.sensors[2]=300;
+	msg.msg.sensors[3]=400;
+	msg.msg.sensors[4]=500;
+	msg.msg.sensors[5]=600;
+	msg.msg.sensors[6]=700;
+	msg.msg.sensors[7]=800;
+	msg.msg.sensors[8]=900;
+	msg.msg.sensors[9]=1000;
+	printf("Message size is:%d\n",sizeof(msg));
   uip_udp_packet_sendto(client_conn, &msg, sizeof(msg),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
@@ -132,8 +180,11 @@ collect_common_send(void)
 void
 collect_common_net_init(void)
 {
-
+#if CONTIKI_TARGET_Z1
+  uart0_set_input(serial_line_input_byte);
+#else
   uart1_set_input(serial_line_input_byte);
+#endif
   serial_line_init();
 }
 /*---------------------------------------------------------------------------*/

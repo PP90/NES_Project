@@ -90,7 +90,7 @@ collect_common_net_init(void)
 static void
 tcpip_handler(void)
 {
-	printf("Received data from the sender\n");
+	
   uint8_t *appdata;
   linkaddr_t sender;
   uint8_t seqno;

@@ -50,7 +50,7 @@ static unsigned long time_offset;
 static int send_active = 1;
 
 #ifndef PERIOD
-#define PERIOD 60
+#define PERIOD 5
 #endif
 #define RANDWAIT (PERIOD)
 
@@ -89,17 +89,21 @@ collect_common_recv(const linkaddr_t *originator, uint8_t seqno, uint8_t hops,
   int i;
 
   printf("%u", 8 + payload_len / 2);
+
   /* Timestamp. Ignore time synch for now. */
   time = get_time();
   printf(" %lu %lu 0", ((time >> 16) & 0xffff), time & 0xffff);
   /* Ignore latency for now */
   printf(" %u %u %u %u",
          originator->u8[0] + (originator->u8[1] << 8), seqno, hops, 0);
+
+	printf("\nData:\n");
   for(i = 0; i < payload_len / 2; i++) {
     memcpy(&data, payload, sizeof(data));
     payload += sizeof(data);
     printf(" %u", data);
   }
+
   printf("\n");
   leds_blink();
 }
@@ -111,7 +115,7 @@ PROCESS_THREAD(collect_common_process, ev, data)
 
   collect_common_net_init();
 
-  /* Send a packet every 60-62 seconds. */
+  /* Send a packet every 5 seconds. */
   etimer_set(&period_timer, CLOCK_SECOND * PERIOD);
   while(1) {
     PROCESS_WAIT_EVENT();
