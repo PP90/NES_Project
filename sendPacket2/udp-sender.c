@@ -49,6 +49,8 @@
 
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
+#include "pollution/pollution-data-structure.c"
+
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -106,6 +108,7 @@ collect_common_send(void)
 struct{
 uint8_t pippo;
  uint8_t for_alignment;
+	uint8_t sensed_value;
 } myMsg;
 
 myMsg.pippo=100;
@@ -162,17 +165,20 @@ myMsg.pippo=100;
                                  parent_etx, rtmetric,
                                  num_neighbors, beacon_interval);
 
-	msg.msg.sensors[0]=100;
-	msg.msg.sensors[1]=200;
-	msg.msg.sensors[2]=300;
-	msg.msg.sensors[3]=400;
-	msg.msg.sensors[4]=500;
-	msg.msg.sensors[5]=600;
-	msg.msg.sensors[6]=700;
-	msg.msg.sensors[7]=800;
-	msg.msg.sensors[8]=900;
-	msg.msg.sensors[9]=1000;
-	printf("Message size is:%d\n",sizeof(msg));
+	struct pollution_data pollution_data_sensed;
+	pollution_sensing(&pollution_data_sensed);
+	print_pollution_values(pollution_data_sensed);
+
+	msg.msg.sensors[0]=pollution_data_sensed.co;
+	msg.msg.sensors[1]=pollution_data_sensed.co2;
+	msg.msg.sensors[2]=pollution_data_sensed.temp;
+	msg.msg.sensors[3]=0;
+	msg.msg.sensors[4]=0;
+	msg.msg.sensors[5]=0;
+	msg.msg.sensors[6]=0;
+	msg.msg.sensors[7]=0;
+	msg.msg.sensors[8]=0;
+	msg.msg.sensors[9]=0;
   uip_udp_packet_sendto(client_conn, &msg, sizeof(msg),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
