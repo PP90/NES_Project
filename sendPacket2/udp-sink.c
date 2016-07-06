@@ -88,30 +88,59 @@ collect_common_net_init(void)
 }
 
 /*---------------------------------------------------------------------------*/
+
+
 void
-extract_data(const linkaddr_t *originator, uint8_t seqno, uint8_t hops,
-                    uint8_t *payload, uint16_t payload_len)
+extract_data
+(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
 //FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
-  unsigned long time;
   uint16_t data;
   int i;
 
-  printf("Payload %u byte\n", 8 + payload_len / 2);
-
-  /* Ignore latency for now */
-  printf(" %u %u %u %u",
-         originator->u8[0] + (originator->u8[1] << 8), seqno, hops, 0);
-
-	printf("\nData:\n");
-  for(i = 0; i < payload_len / 2; i++) {
+payload += sizeof(data)*12;
+	printf("\nData from sensors:\n");
+  for(i = 12; i < payload_len / 2; i++) {
     memcpy(&data, payload, sizeof(data));
     payload += sizeof(data);
+
+	switch(i){
+	case 12:
+	break;
+		
+	case 13:
+	break;
+
+	case 14:
+	break;
+		
+	case 15:
+	break;
+
+	case 16:
+	break;
+
+	case 17:
+	break;
+
+	case 18:
+	break;
+
+	case 19:
+	break;
+
+	case 20:
+	break;
+
+	case 21:
+	break;
+	
+	}
+
     printf(" %u", data);
   }
+	printf("\n");
 
-  printf("\n");
-  leds_blink();
 }
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -130,8 +159,8 @@ tcpip_handler(void)
     sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
     seqno = *appdata;
     hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;
-    collect_common_recv(&sender, seqno, hops,
-                        appdata + 2, uip_datalen() - 2);
+	extract_data(seqno, appdata + 2, uip_datalen() - 2);
+    collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
   }
 }
 /*---------------------------------------------------------------------------*/

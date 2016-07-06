@@ -128,5 +128,4 @@ power_tracing(struct pow_tracking_info_all *pow_info_all,  struct pow_tracking_i
 
   pow_info_all->seqno=seqno++;
 	//send_data_pow_cons(pow_info_actual);
-	print_actual_pow(*pow_info_actual);
 }	

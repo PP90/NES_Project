@@ -93,8 +93,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>81.19007334639991</x>
-        <y>30.908633985944547</y>
+        <x>73.70476737602054</x>
+        <y>15.05739781337647</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -129,8 +129,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>59.68940668143804</x>
-        <y>39.98898404350989</y>
+        <x>61.01034302915205</x>
+        <y>46.15335366617525</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -143,29 +143,11 @@
       </interface_config>
       <motetype_identifier>sky2</motetype_identifier>
     </mote>
-    <mote>
-      <breakpoints />
-      <interface_config>
-        org.contikios.cooja.interfaces.Position
-        <x>36.953380956691205</x>
-        <y>28.973837515125513</y>
-        <z>0.0</z>
-      </interface_config>
-      <interface_config>
-        org.contikios.cooja.mspmote.interfaces.MspClock
-        <deviation>1.0</deviation>
-      </interface_config>
-      <interface_config>
-        org.contikios.cooja.mspmote.interfaces.MspMoteID
-        <id>4</id>
-      </interface_config>
-      <motetype_identifier>sky3</motetype_identifier>
-    </mote>
   </simulation>
   <plugin>
     org.contikios.cooja.plugins.SimControl
     <width>280</width>
-    <z>1</z>
+    <z>2</z>
     <height>160</height>
     <location_x>400</location_x>
     <location_y>0</location_y>
@@ -181,7 +163,7 @@
       <viewport>2.271116246586565 0.0 0.0 2.271116246586565 -17.065065764847482 84.39761679074192</viewport>
     </plugin_config>
     <width>251</width>
-    <z>2</z>
+    <z>1</z>
     <height>400</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
@@ -205,7 +187,6 @@
       <mote>0</mote>
       <mote>1</mote>
       <mote>2</mote>
-      <mote>3</mote>
       <showRadioRXTX />
       <showRadioHW />
       <showLEDs />

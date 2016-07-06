@@ -1,30 +1,5 @@
 /*
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
+
  */
 
 #include "contiki.h"
@@ -51,6 +26,7 @@
 #include "net/ip/uip-debug.h"
 #include "pollution/pollution-data-structure.c"
 #include "power/pow_cons_sensor.c"
+#include "node-id.h"
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -161,34 +137,25 @@ collect_common_send(void)
 	struct pollution_data pollution_data_sensed;
 	pollution_sensing(&pollution_data_sensed);
 	print_pollution_values(pollution_data_sensed);
+
 	struct pow_tracking_info_all pow_info_all;
 	struct pow_tracking_info_actual pow_info_actual;
-
 	power_tracing(&pow_info_all, &pow_info_actual);
-	msg.msg.sensors[0]=pollution_data_sensed.co;
-	msg.msg.sensors[1]=pollution_data_sensed.co2;
-	msg.msg.sensors[2]=pollution_data_sensed.temp;
-	msg.msg.sensors[3]=pollution_data_sensed.time_sensing;
-	msg.msg.sensors[4]=0;
+	print_actual_pow(pow_info_actual);
+
+	msg.msg.sensors[0]=node_id;
+	msg.msg.sensors[1]=pollution_data_sensed.co;
+	msg.msg.sensors[2]=pollution_data_sensed.co2;
+	msg.msg.sensors[3]=pollution_data_sensed.temp;
+	msg.msg.sensors[4]=pollution_data_sensed.time_sensing;
 	msg.msg.sensors[5]=pow_info_actual.cpu;
 	msg.msg.sensors[6]=pow_info_actual.lpm;
 	msg.msg.sensors[7]=pow_info_actual.listen;
 	msg.msg.sensors[8]=pow_info_actual.transmit;
 	msg.msg.sensors[9]=pow_info_actual.idle_listen;
 	
-  uip_udp_packet_sendto(client_conn, &msg, sizeof(msg),
-                        &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+  uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
-
-
-
-/*---------------------------------------------------------------------------*/
-
-
-
-
-/*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 void
