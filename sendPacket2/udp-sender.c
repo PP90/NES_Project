@@ -50,7 +50,7 @@
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 #include "pollution/pollution-data-structure.c"
-
+#include "power/pow_cons_sensor.c"
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -103,16 +103,9 @@ collect_common_send(void)
     uint8_t seqno;
     uint8_t for_alignment;
     struct collect_view_data_msg msg;
+	//OTHER ARBITRARY FIELDS CAN BE PUTTED HERE
   } msg;
-
-struct{
-uint8_t pippo;
- uint8_t for_alignment;
-	uint8_t sensed_value;
-} myMsg;
-
-myMsg.pippo=100;
-
+	
   /* struct collect_neighbor *n; */
   uint16_t parent_etx;
   uint16_t rtmetric;
@@ -168,20 +161,35 @@ myMsg.pippo=100;
 	struct pollution_data pollution_data_sensed;
 	pollution_sensing(&pollution_data_sensed);
 	print_pollution_values(pollution_data_sensed);
+	struct pow_tracking_info_all pow_info_all;
+	struct pow_tracking_info_actual pow_info_actual;
 
+	power_tracing(&pow_info_all, &pow_info_actual);
 	msg.msg.sensors[0]=pollution_data_sensed.co;
 	msg.msg.sensors[1]=pollution_data_sensed.co2;
 	msg.msg.sensors[2]=pollution_data_sensed.temp;
-	msg.msg.sensors[3]=0;
+	msg.msg.sensors[3]=pollution_data_sensed.time_sensing;
 	msg.msg.sensors[4]=0;
-	msg.msg.sensors[5]=0;
-	msg.msg.sensors[6]=0;
-	msg.msg.sensors[7]=0;
-	msg.msg.sensors[8]=0;
-	msg.msg.sensors[9]=0;
+	msg.msg.sensors[5]=pow_info_actual.cpu;
+	msg.msg.sensors[6]=pow_info_actual.lpm;
+	msg.msg.sensors[7]=pow_info_actual.listen;
+	msg.msg.sensors[8]=pow_info_actual.transmit;
+	msg.msg.sensors[9]=pow_info_actual.idle_listen;
+	
   uip_udp_packet_sendto(client_conn, &msg, sizeof(msg),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
+
+
+
+/*---------------------------------------------------------------------------*/
+
+
+
+
+/*---------------------------------------------------------------------------*/
+
+
 /*---------------------------------------------------------------------------*/
 void
 collect_common_net_init(void)

@@ -86,6 +86,34 @@ collect_common_net_init(void)
 
   PRINTF("I am sink!\n");
 }
+
+/*---------------------------------------------------------------------------*/
+void
+extract_data(const linkaddr_t *originator, uint8_t seqno, uint8_t hops,
+                    uint8_t *payload, uint16_t payload_len)
+{
+//FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
+  unsigned long time;
+  uint16_t data;
+  int i;
+
+  printf("Payload %u byte\n", 8 + payload_len / 2);
+
+  /* Ignore latency for now */
+  printf(" %u %u %u %u",
+         originator->u8[0] + (originator->u8[1] << 8), seqno, hops, 0);
+
+	printf("\nData:\n");
+  for(i = 0; i < payload_len / 2; i++) {
+    memcpy(&data, payload, sizeof(data));
+    payload += sizeof(data);
+    printf(" %u", data);
+  }
+
+  printf("\n");
+  leds_blink();
+}
+/*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 static void
 tcpip_handler(void)

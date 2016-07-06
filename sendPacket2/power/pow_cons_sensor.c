@@ -97,30 +97,27 @@ void send_data_pow_cons(struct pow_tracking_info_actual *pow_info_actual){
 
 	
 void
-powertracing(void)
+power_tracing(struct pow_tracking_info_all *pow_info_all,  struct pow_tracking_info_actual *pow_info_actual)
 {
   static unsigned long last_cpu, last_lpm, last_transmit, last_listen;
   static unsigned long last_idle_transmit, last_idle_listen;
   static unsigned long seqno;
 	
   energest_flush();
-
-  struct pow_tracking_info_all pow_info_all;
-  struct pow_tracking_info_actual pow_info_actual;	
 	
-  pow_info_all.all_cpu = energest_type_time(ENERGEST_TYPE_CPU);
-  pow_info_all.all_lpm = energest_type_time(ENERGEST_TYPE_LPM);
-  pow_info_all.all_transmit = energest_type_time(ENERGEST_TYPE_TRANSMIT);
-  pow_info_all.all_listen = energest_type_time(ENERGEST_TYPE_LISTEN);
-  pow_info_all.all_idle_transmit = compower_idle_activity.transmit;
-  pow_info_all.all_idle_listen = compower_idle_activity.listen;
+  pow_info_all->all_cpu = energest_type_time(ENERGEST_TYPE_CPU);
+  pow_info_all->all_lpm = energest_type_time(ENERGEST_TYPE_LPM);
+  pow_info_all->all_transmit = energest_type_time(ENERGEST_TYPE_TRANSMIT);
+  pow_info_all->all_listen = energest_type_time(ENERGEST_TYPE_LISTEN);
+  pow_info_all->all_idle_transmit = compower_idle_activity.transmit;
+  pow_info_all->all_idle_listen = compower_idle_activity.listen;
 
-  pow_info_actual.cpu = pow_info_all.all_cpu - last_cpu;
-  pow_info_actual.lpm = pow_info_all.all_lpm - last_lpm;
-  pow_info_actual.transmit = pow_info_all.all_transmit - last_transmit;
-  pow_info_actual.listen = pow_info_all.all_listen - last_listen;
-  pow_info_actual.idle_transmit = compower_idle_activity.transmit - last_idle_transmit;
-  pow_info_actual.idle_listen = compower_idle_activity.listen - last_idle_listen;
+  pow_info_actual->cpu = pow_info_all->all_cpu - last_cpu;
+  pow_info_actual->lpm = pow_info_all->all_lpm - last_lpm;
+  pow_info_actual->transmit = pow_info_all->all_transmit - last_transmit;
+  pow_info_actual->listen = pow_info_all->all_listen - last_listen;
+  pow_info_actual->idle_transmit = compower_idle_activity.transmit - last_idle_transmit;
+  pow_info_actual->idle_listen = compower_idle_activity.listen - last_idle_listen;
 
   last_cpu = energest_type_time(ENERGEST_TYPE_CPU);
   last_lpm = energest_type_time(ENERGEST_TYPE_LPM);
@@ -129,35 +126,7 @@ powertracing(void)
   last_idle_listen = compower_idle_activity.listen;
   last_idle_transmit = compower_idle_activity.transmit;
 
-  pow_info_all.seqno=seqno++;
+  pow_info_all->seqno=seqno++;
 	//send_data_pow_cons(pow_info_actual);
-	print_actual_pow(pow_info_actual);
+	print_actual_pow(*pow_info_actual);
 }	
-
-
-void
-powertracing2(void)
-{ 
-
-
-
-}
-/*---------------------------------------------------------------------------*/
-PROCESS(pow_cons_test, "pow_cons_test");
-AUTOSTART_PROCESSES(&pow_cons_test);
-/*----------------------------------1-----------------------------------------*/
-PROCESS_THREAD(pow_cons_test, ev, data)
-{
-  PROCESS_BEGIN();
-
-	static struct etimer et;
-
-	while (1){
-		etimer_set(&et, CLOCK_SECOND);
-    		PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
-		powertracing();
-		}
-
-  PROCESS_END();
-}
-/*---------------------------------------------------------------------------*/
