@@ -8,7 +8,6 @@
 
 #define NUM_TICKS_IN_ONE_SECOND 32768
 
-
 struct pow_tracking_info_actual{
 //the sum is the total time
 unsigned long cpu;
@@ -46,6 +45,7 @@ pow_info_all->all_idle_transmit=0;
 pow_info_all->all_idle_listen=0;
 }
 
+//TO NOT DELETE CAUSE PRINT THE INFO
 /*
 void
 print_powertracing
@@ -87,7 +87,7 @@ CPU %lu\nLPM %lu\ntransmit %lu\nlisten %lu\nidleTransmit %lu\nidleListen %lu\n\
 
 void print_actual_pow(struct pow_tracking_info_actual pow_info_actual){
 	printf("(CPU) (LPM) Time:(%lu)(%lu) %lu\n",pow_info_actual.cpu, pow_info_actual.lpm, pow_info_actual.cpu+pow_info_actual.lpm);
-	printf("(LISTEN) (TX) radio:(%lu)(%lu) %lu\n",pow_info_actual.listen, pow_info_actual.transmit, pow_info_actual.listen+pow_info_actual.transmit);
+	printf("(IDLE_LISTEN) (TOT_LISTEN) (TX) radio_time:(%lu) (%lu) (%lu) %lu\n",pow_info_actual.idle_listen, pow_info_actual.listen, pow_info_actual.transmit, pow_info_actual.listen+pow_info_actual.transmit);
 
 }
 void send_data_pow_cons(struct pow_tracking_info_actual *pow_info_actual){
@@ -127,5 +127,4 @@ power_tracing(struct pow_tracking_info_all *pow_info_all,  struct pow_tracking_i
   last_idle_transmit = compower_idle_activity.transmit;
 
   pow_info_all->seqno=seqno++;
-	//send_data_pow_cons(pow_info_actual);
 }	

@@ -90,55 +90,61 @@ collect_common_net_init(void)
 /*---------------------------------------------------------------------------*/
 
 
+void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
+{
+	uint8_t i=0;
+	uint16_t pollution_data;
+	unsigned long pow_cons_data;
+	printf("(#%u) Packet size:%u byte\n",seqno, payload_len);
+payload += sizeof(pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
+
+printf("Power consumption data:\n");
+while(i<5) {	
+	memcpy(&pow_cons_data, payload, sizeof(pow_cons_data));
+    payload += sizeof(pow_cons_data);//Shift of 32 bit
+	printf(" %lu", pow_cons_data);
+	i++;
+  }
+	printf("\n");
+
+
+printf("Pollution data:\n");
+while(i<8) {
+	memcpy(&pollution_data, payload, sizeof(pollution_data));
+    payload += sizeof(pollution_data);//Shift of 16 bit
+	printf(" %u", pollution_data);
+	i++;
+  }
+	printf("\n");
+
+
+
+
+
+}
+
+
 void
 extract_data
 (uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
+
+
+
 //FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
-  uint16_t data;
-  int i;
+	uint16_t data;
+	uint16_t data2;
+	uint16_t data3;
+	int i;
 
-payload += sizeof(data)*12;
-	printf("\nData from sensors:\n");
-  for(i = 12; i < payload_len / 2; i++) {
-    memcpy(&data, payload, sizeof(data));
-    payload += sizeof(data);
+	payload += sizeof(data)*12;
+	printf("\nData:\n");
 
-	switch(i){
-	case 12:
-	break;
-		
-	case 13:
-	break;
-
-	case 14:
-	break;
-		
-	case 15:
-	break;
-
-	case 16:
-	break;
-
-	case 17:
-	break;
-
-	case 18:
-	break;
-
-	case 19:
-	break;
-
-	case 20:
-	break;
-
-	case 21:
-	break;
-	
-	}
-
-    printf(" %u", data);
-  }
+	for(i = 12; i < payload_len / 2; i++) {
+		memcpy(&data, payload, sizeof(data));
+		payload += sizeof(data);
+		printf(" %u", data);
+  	}
 	printf("\n");
 
 }
@@ -159,8 +165,9 @@ tcpip_handler(void)
     sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
     seqno = *appdata;
     hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;
-	extract_data(seqno, appdata + 2, uip_datalen() - 2);
-    collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
+	printf("received data\n");
+	extract_data2(seqno, appdata + 2, uip_datalen() - 2);
+    //collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
   }
 }
 /*---------------------------------------------------------------------------*/

@@ -79,8 +79,19 @@ collect_common_send(void)
     uint8_t seqno;
     uint8_t for_alignment;
     struct collect_view_data_msg msg;
-	//OTHER ARBITRARY FIELDS CAN BE PUTTED HERE
-  } msg;
+	unsigned long cpu;
+	unsigned long lpm;
+	//the sum is the radio time
+	unsigned long idle_listen;	
+	unsigned long listen;
+	unsigned long transmit;
+		
+	uint16_t co2;
+	uint16_t co;
+	uint16_t temp;
+
+
+} msg;
 	
   /* struct collect_neighbor *n; */
   uint16_t parent_etx;
@@ -140,20 +151,22 @@ collect_common_send(void)
 
 	struct pow_tracking_info_all pow_info_all;
 	struct pow_tracking_info_actual pow_info_actual;
+
 	power_tracing(&pow_info_all, &pow_info_actual);
 	print_actual_pow(pow_info_actual);
 
-	msg.msg.sensors[0]=node_id;
-	msg.msg.sensors[1]=pollution_data_sensed.co;
-	msg.msg.sensors[2]=pollution_data_sensed.co2;
-	msg.msg.sensors[3]=pollution_data_sensed.temp;
-	msg.msg.sensors[4]=pollution_data_sensed.time_sensing;
-	msg.msg.sensors[5]=pow_info_actual.cpu;
-	msg.msg.sensors[6]=pow_info_actual.lpm;
-	msg.msg.sensors[7]=pow_info_actual.listen;
-	msg.msg.sensors[8]=pow_info_actual.transmit;
-	msg.msg.sensors[9]=pow_info_actual.idle_listen;
+	msg.cpu=pow_info_actual.cpu;
+	msg.lpm=pow_info_actual.lpm;
 	
+	msg.listen=pow_info_actual.listen;
+	msg.transmit=pow_info_actual.transmit;
+		
+
+	msg.co2=pollution_data_sensed.co2;
+	msg.co=pollution_data_sensed.co;	
+	msg.temp=pollution_data_sensed.temp;
+
+	printf("the size of msg.msg is:%u\n",sizeof(msg.msg));
   uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
 

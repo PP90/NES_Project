@@ -63,7 +63,7 @@ collect_common_recv(const linkaddr_t *originator, uint8_t seqno, uint8_t hops,
   printf(" %u %u %u %u",
          originator->u8[0] + (originator->u8[1] << 8), seqno, hops, 0);
 
-	printf("\nData:\n");
+	printf("\nall Data:\n");
   for(i = 0; i < payload_len / 2; i++) {
     memcpy(&data, payload, sizeof(data));
     payload += sizeof(data);

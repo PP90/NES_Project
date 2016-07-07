@@ -147,7 +147,7 @@
   <plugin>
     org.contikios.cooja.plugins.SimControl
     <width>280</width>
-    <z>2</z>
+    <z>1</z>
     <height>160</height>
     <location_x>400</location_x>
     <location_y>0</location_y>
@@ -163,7 +163,7 @@
       <viewport>2.271116246586565 0.0 0.0 2.271116246586565 -17.065065764847482 84.39761679074192</viewport>
     </plugin_config>
     <width>251</width>
-    <z>1</z>
+    <z>3</z>
     <height>400</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
@@ -176,10 +176,10 @@
       <coloring />
     </plugin_config>
     <width>1150</width>
-    <z>0</z>
-    <height>240</height>
+    <z>2</z>
+    <height>284</height>
     <location_x>249</location_x>
-    <location_y>240</location_y>
+    <location_y>196</location_y>
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.TimeLine
@@ -201,12 +201,14 @@
   <plugin>
     org.contikios.cooja.plugins.Notes
     <plugin_config>
-      <notes>Enter notes here</notes>
+      <notes>Packet data structure sender to the sink:
+1. Node_id, CO2, Temperature, CO, 
+CPU_time, LPM_time, Listen_time, Transmission time, Idle_time</notes>
       <decorations>true</decorations>
     </plugin_config>
     <width>486</width>
-    <z>3</z>
-    <height>160</height>
+    <z>0</z>
+    <height>203</height>
     <location_x>680</location_x>
     <location_y>0</location_y>
   </plugin>
