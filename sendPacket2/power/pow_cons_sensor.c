@@ -5,6 +5,7 @@
 #include "net/rime/rime.h"
 #include <stdio.h>
 #include <string.h>
+#include "pow_cons.h"
 
 #define NUM_TICKS_IN_ONE_SECOND 32768
 
@@ -84,18 +85,28 @@ CPU %lu\nLPM %lu\ntransmit %lu\nlisten %lu\nidleTransmit %lu\nidleListen %lu\n\
 }
 */
 
+void print_duty_cycle(struct pow_tracking_info_actual pow_info_actual){
+	unsigned long time=pow_info_actual.cpu + pow_info_actual.lpm;
+	unsigned long radio=pow_info_actual.transmit + pow_info_actual.listen;
+printf("\nDuty cycle:  %d.%02d%%\n", (int)((100L * radio) / time),
+	(int)((10000L * radio / time) - (100L *radio/ time) * 100));
+}
+
+//Time is expressed in ticks
+//power consumption is expressed in 
+
+uint16_t energy_cons(uint16_t pow_cons, unsigned long time_ticks){
+return pow_cons*time_ticks/NUM_TICKS_IN_ONE_SECOND;
+}
+
+
 
 void print_actual_pow(struct pow_tracking_info_actual pow_info_actual){
 	printf("(CPU) (LPM) Time:(%lu)(%lu) %lu\n",pow_info_actual.cpu, pow_info_actual.lpm, pow_info_actual.cpu+pow_info_actual.lpm);
 	printf("(IDLE_LISTEN) (TOT_LISTEN) (TX) radio_time:(%lu) (%lu) (%lu) %lu\n",pow_info_actual.idle_listen, pow_info_actual.listen, pow_info_actual.transmit, pow_info_actual.listen+pow_info_actual.transmit);
 
 }
-void send_data_pow_cons(struct pow_tracking_info_actual *pow_info_actual){
-		
 
-}
-
-	
 void
 power_tracing(struct pow_tracking_info_all *pow_info_all,  struct pow_tracking_info_actual *pow_info_actual)
 {

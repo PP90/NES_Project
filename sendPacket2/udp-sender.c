@@ -158,6 +158,7 @@ collect_common_send(void)
 	msg.cpu=pow_info_actual.cpu;
 	msg.lpm=pow_info_actual.lpm;
 	
+	msg.idle_listen=pow_info_actual.idle_listen;
 	msg.listen=pow_info_actual.listen;
 	msg.transmit=pow_info_actual.transmit;
 		

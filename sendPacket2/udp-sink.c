@@ -51,6 +51,7 @@
 
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
+#include "power/pow_cons_sensor.c"
 
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
 
@@ -90,21 +91,58 @@ collect_common_net_init(void)
 /*---------------------------------------------------------------------------*/
 
 
+void set_data_pow_cons(uint8_t i, unsigned long pow_cons_data, struct pow_tracking_info_actual *pow_info_actual){
+
+	switch(i){
+	case 0:
+	pow_info_actual->cpu=pow_cons_data;
+	break;
+
+	case 1:
+	pow_info_actual->lpm=pow_cons_data;
+	break;
+
+	case 2:
+	pow_info_actual->idle_listen=pow_cons_data;
+	break;
+
+	case 3:
+	pow_info_actual->listen=pow_cons_data;
+	break;
+
+	case 4:
+	pow_info_actual->transmit=pow_cons_data;
+	break;
+
+	default:
+	break;
+	}
+}
+/**/
+/*---------------------------------------------------------------------------*/
+
 void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
 	uint8_t i=0;
 	uint16_t pollution_data;
 	unsigned long pow_cons_data;
+	struct pow_tracking_info_actual pow_info_actual;
+
 	printf("(#%u) Packet size:%u byte\n",seqno, payload_len);
 payload += sizeof(pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
 
 printf("Power consumption data:\n");
 while(i<5) {	
 	memcpy(&pow_cons_data, payload, sizeof(pow_cons_data));
-    payload += sizeof(pow_cons_data);//Shift of 32 bit
+	
+    payload += sizeof(pow_cons_data);//Shift of 32 bit (4 byte)
+	set_data_pow_cons(i, pow_cons_data, &pow_info_actual);
 	printf(" %lu", pow_cons_data);
 	i++;
   }
+	print_duty_cycle(pow_info_actual);
+	
+	printf("Energy consumed: %u mJ\n",energy_cons(CC2420_RX, pow_info_actual.listen));
 	printf("\n");
 
 
