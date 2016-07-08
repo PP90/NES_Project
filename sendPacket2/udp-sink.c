@@ -131,18 +131,18 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	printf("(#%u) Packet size:%u byte\n",seqno, payload_len);
 payload += sizeof(pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
 
-printf("Power consumption data:\n");
+//printf("Power consumption data:\n");
 while(i<5) {	
 	memcpy(&pow_cons_data, payload, sizeof(pow_cons_data));
 	
     payload += sizeof(pow_cons_data);//Shift of 32 bit (4 byte)
 	set_data_pow_cons(i, pow_cons_data, &pow_info_actual);
-	printf(" %lu", pow_cons_data);
+	//printf(" %lu", pow_cons_data);
 	i++;
   }
-	print_duty_cycle(pow_info_actual);
-	
-	printf("Energy consumed: %u mJ\n",energy_cons(CC2420_RX, pow_info_actual.listen));
+	print_energy_cons_radio(pow_info_actual);
+
+
 	printf("\n");
 
 
@@ -154,10 +154,6 @@ while(i<8) {
 	i++;
   }
 	printf("\n");
-
-
-
-
 
 }
 

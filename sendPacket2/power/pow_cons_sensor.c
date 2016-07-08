@@ -100,6 +100,19 @@ return pow_cons*time_ticks/NUM_TICKS_IN_ONE_SECOND;
 }
 
 
+void print_energy_cons_microcontr(struct pow_tracking_info_actual pow_info_actual){
+
+}
+
+void print_energy_cons_radio(struct pow_tracking_info_actual pow_info_actual){
+	print_duty_cycle(pow_info_actual);
+	printf("Total period %lu ms\n",1000*(pow_info_actual.cpu+pow_info_actual.lpm)/NUM_TICKS_IN_ONE_SECOND);
+	printf("Energy consumed: (RX_IDLE) %u uJ\n",energy_cons(CC2420_RX, pow_info_actual.idle_listen*1000));
+	printf("Energy consumed: (RX) %u uJ\n",energy_cons(CC2420_RX, pow_info_actual.listen*1000));
+	printf("Energy consumed: (TX)%u uJ\n",energy_cons(CC2420_TX, pow_info_actual.transmit*1000));
+	unsigned long idle_radio=pow_info_actual.cpu+pow_info_actual.lpm-pow_info_actual.listen-pow_info_actual.transmit;
+	printf("Energy consumed: (Idle)%u uJ\n",energy_cons(CC2420_IDLE, idle_radio));//Not multiplied per 1000 'cause the CC2420_IDLE is expressed in uW
+}
 
 void print_actual_pow(struct pow_tracking_info_actual pow_info_actual){
 	printf("(CPU) (LPM) Time:(%lu)(%lu) %lu\n",pow_info_actual.cpu, pow_info_actual.lpm, pow_info_actual.cpu+pow_info_actual.lpm);

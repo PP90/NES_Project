@@ -23,13 +23,13 @@
 #define POLLUTION_SENSOR_SUPPLY 9//V
 
 //CO SENSOR
-#define CO_SENSOR_HEATING 0.083//W
+#define CO_SENSOR_HEATING 83//mW
 
 //CO2 SENSOR
 #define CO2_SENSOR_LOW 25*5//(mA*V)=mW
-#define CO2_SENSOR_PEAK 125*POLLUTION_SENSOR_SUPPLY//(mA*V)=MW
+#define CO2_SENSOR_PEAK 125*POLLUTION_SENSOR_SUPPLY//(mA*V)=mW
 
 //TEMP SENSOR
-#define HEAT_DISSIPATION_CONSTANT 0.035//(W/°C) to be multiplied by the °C sensed
-#define OPERATIONAL_CONSUME 0.045//(W) to be multiplied by the °C sensed
+#define HEAT_DISSIPATION_CONSTANT 35//(mW/°C) to be multiplied by the °C sensed
+#define OPERATIONAL_CONSUME 45//(mW) to be multiplied by the °C sensed
 #endif
