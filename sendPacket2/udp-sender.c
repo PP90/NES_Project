@@ -89,7 +89,7 @@ collect_common_send(void)
 	uint16_t co2;
 	uint16_t co;
 	uint16_t temp;
-
+	uint16_t time_sensing;
 
 } msg;
 	
@@ -166,8 +166,8 @@ collect_common_send(void)
 	msg.co2=pollution_data_sensed.co2;
 	msg.co=pollution_data_sensed.co;	
 	msg.temp=pollution_data_sensed.temp;
+	msg.time_sensing=pollution_data_sensed.time_sensing;
 
-	printf("the size of msg.msg is:%u\n",sizeof(msg.msg));
   uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
 

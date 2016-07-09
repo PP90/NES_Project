@@ -52,7 +52,7 @@
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 #include "power/pow_cons_sensor.c"
-
+#include "pollution/pollution-data-structure.c"
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 #define UDP_CLIENT_PORT 8775
@@ -118,18 +118,45 @@ void set_data_pow_cons(uint8_t i, unsigned long pow_cons_data, struct pow_tracki
 	break;
 	}
 }
+
+void set_data_pollution(uint8_t i, uint16_t rec_pollution_data,struct pollution_data *pollution_info){
+
+	switch(i){
+	case 5:
+	pollution_info->co=rec_pollution_data;
+	break;
+
+	case 6:
+	pollution_info->co2=rec_pollution_data;
+	break;
+
+	case 7:
+	pollution_info->temp=rec_pollution_data;
+	break;
+
+	case 8:
+	pollution_info->time_sensing=rec_pollution_data;
+	break;
+
+	default:
+	break;
+	}
+}
+
 /**/
 /*---------------------------------------------------------------------------*/
+
 
 void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
 	uint8_t i=0;
-	uint16_t pollution_data;
+	uint16_t rec_pollution_data;
 	unsigned long pow_cons_data;
 	struct pow_tracking_info_actual pow_info_actual;
+	struct pollution_data pollution_data;
 
-	printf("(#%u) Packet size:%u byte\n",seqno, payload_len);
-payload += sizeof(pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
+	printf("(#%u)\n",seqno);
+	payload += sizeof(rec_pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
 
 //printf("Power consumption data:\n");
 while(i<5) {	
@@ -140,19 +167,21 @@ while(i<5) {
 	//printf(" %lu", pow_cons_data);
 	i++;
   }
+	print_duty_cycle(pow_info_actual);
 	print_energy_cons_radio(pow_info_actual);
 
+	print_cpu_usage(pow_info_actual);
+	print_energy_cons_ucontr(pow_info_actual);
 
-	printf("\n");
-
-
-printf("Pollution data:\n");
-while(i<8) {
-	memcpy(&pollution_data, payload, sizeof(pollution_data));
-    payload += sizeof(pollution_data);//Shift of 16 bit
-	printf(" %u", pollution_data);
+//printf("Pollution data:\n");
+while(i<9) {
+	memcpy(&rec_pollution_data, payload, sizeof(rec_pollution_data));
+    payload += sizeof(rec_pollution_data);//Shift of 16 bit
+	set_data_pollution(i, rec_pollution_data,&pollution_data);
+	//printf(" %u", pollution_data);
 	i++;
   }
+	print_energy_pollution_sens(pollution_data.time_sensing);
 	printf("\n");
 
 }
@@ -199,7 +228,6 @@ tcpip_handler(void)
     sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
     seqno = *appdata;
     hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;
-	printf("received data\n");
 	extract_data2(seqno, appdata + 2, uip_datalen() - 2);
     //collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
   }
