@@ -53,6 +53,7 @@
 #include "net/ip/uip-debug.h"
 #include "power/pow_cons_sensor.c"
 #include "pollution/pollution-data-structure.c"
+#include "energy/energy_data_structure.c"
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 #define UDP_CLIENT_PORT 8775
@@ -154,6 +155,7 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	unsigned long pow_cons_data;
 	struct pow_tracking_info_actual pow_info_actual;
 	struct pollution_data pollution_data;
+	struct energy_cons energy_cons_data;
 
 	printf("(#%u)\n",seqno);
 	payload += sizeof(rec_pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
@@ -167,11 +169,15 @@ while(i<5) {
 	//printf(" %lu", pow_cons_data);
 	i++;
   }
+	//The duty cycle and the energy consumption of the radio is printed out
 	print_duty_cycle(pow_info_actual);
-	print_energy_cons_radio(pow_info_actual);
+	set_energy_cons_radio(&energy_cons_data, pow_info_actual);
+	radio_energy_cons_print(energy_cons_data);
 
+	//The usage and the energy consumption of the CPU is printed out
 	print_cpu_usage(pow_info_actual);
-	print_energy_cons_ucontr(pow_info_actual);
+	set_energy_cons_ucontr(&energy_cons_data,pow_info_actual);
+	energy_cons_cpu_print(energy_cons_data);
 
 //printf("Pollution data:\n");
 while(i<9) {
@@ -181,7 +187,9 @@ while(i<9) {
 	//printf(" %u", pollution_data);
 	i++;
   }
-	print_energy_pollution_sens(pollution_data.time_sensing);
+	//The energy consumption of the pollution sensor is printed out
+	set_energy_pollution_sens(&energy_cons_data, pollution_data.time_sensing);
+	energy_pollution_sens_print(energy_cons_data);
 	printf("\n");
 
 }

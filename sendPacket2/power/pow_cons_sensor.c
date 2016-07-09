@@ -88,7 +88,7 @@ CPU %lu\nLPM %lu\ntransmit %lu\nlisten %lu\nidleTransmit %lu\nidleListen %lu\n\
 void print_duty_cycle(struct pow_tracking_info_actual pow_info_actual){
 	unsigned long time=pow_info_actual.cpu + pow_info_actual.lpm;
 	unsigned long radio=pow_info_actual.transmit + pow_info_actual.listen;
-printf("\nDuty cycle:  %d.%02d%% (Period:%u ms)\n", (int)((100L * radio) / time),
+printf("\nDuty cycle:  %d.%02d%% (Period:%lu ms)\n", (int)((100L * radio) / time),
 	(int)((10000L * radio / time) - (100L *radio/ time) * 100),1000*time/NUM_TICKS_IN_ONE_SECOND);
 }
 
@@ -96,40 +96,6 @@ void print_cpu_usage(struct pow_tracking_info_actual pow_info_actual){
 	unsigned long time=pow_info_actual.cpu + pow_info_actual.lpm;
 printf("\nCpu usage:  %d.%02d%%\n", (int)((100L * pow_info_actual.cpu) / time),
 	(int)((10000L * pow_info_actual.cpu / time) - (100L *pow_info_actual.cpu/ time) * 100));
-}
-
-
-//Time is expressed in ticks
-
-uint16_t energy_cons(uint16_t pow_cons, unsigned long time_ticks){
-return pow_cons*time_ticks/NUM_TICKS_IN_ONE_SECOND;//W*s=J
-}
-
-
-void print_energy_pollution_sens(uint16_t time_sensing){
-printf("\nPollution sensor energy consumption info:\n");
-printf("Time sensing:%u s\n",time_sensing);//Expressed in seconds
-printf("(co_sensor) %u mJ\n", CO_SENSOR_OP_CONDITION*time_sensing);//mW*s=mJ
-printf("(co2_sensor (MIN) %u mJ (peak) %u mJ)\n",CO2_SENSOR_LOW*time_sensing, CO2_SENSOR_PEAK*time_sensing);//mW*s=mJ
-printf("(temp) %u mJ\n",OPERATIONAL_CONSUME*time_sensing);//mW*s=mJ
-}
-
-
-void print_energy_cons_ucontr(struct pow_tracking_info_actual pow_info_actual){
-printf("(CPU_ACTIVE) %u uJ\n",energy_cons(MSP430F1611_ACTIVE_MODE, pow_info_actual.cpu)/1000);//nW*s/1000=mJ
-printf("(CPU_IDLE) %u uJ\n",energy_cons(MSP430F1611_STANBY_MODE, pow_info_actual.lpm)/1000);//nW*s/1000=mJ
-}
-
-
-void print_energy_cons_radio(struct pow_tracking_info_actual pow_info_actual){
-        
-	unsigned long idle_radio=pow_info_actual.cpu+pow_info_actual.lpm-pow_info_actual.listen-pow_info_actual.transmit;
-
-	printf("Radio energy consumption:\n");
-	printf("(rx_idle) %u uJ\n",energy_cons(CC2420_RX, pow_info_actual.idle_listen*1000));//mV*s*1000=uJ
-	printf("(rx) %u uJ\n",energy_cons(CC2420_RX, pow_info_actual.listen*1000));//mV*s*1000=uJ
-	printf("(tx)%u uJ\n",energy_cons(CC2420_TX, pow_info_actual.transmit*1000));//mV*s*1000=uJ
-	printf("(Idle)%u uJ\n",energy_cons(CC2420_IDLE, idle_radio));//Not multiplied per 1000 'cause the CC2420_IDLE is expressed in uW
 }
 
 void print_actual_pow(struct pow_tracking_info_actual pow_info_actual){
