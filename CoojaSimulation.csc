@@ -176,7 +176,7 @@
       <coloring />
     </plugin_config>
     <width>1150</width>
-    <z>2</z>
+    <z>0</z>
     <height>284</height>
     <location_x>249</location_x>
     <location_y>196</location_y>
@@ -207,8 +207,8 @@ CPU_time, LPM_time, Listen_time, Transmission time, Idle_time</notes>
       <decorations>true</decorations>
     </plugin_config>
     <width>486</width>
-    <z>0</z>
-    <height>203</height>
+    <z>2</z>
+    <height>202</height>
     <location_x>680</location_x>
     <location_y>0</location_y>
   </plugin>

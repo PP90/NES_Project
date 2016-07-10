@@ -170,12 +170,11 @@ while(i<5) {
 	i++;
   }
 	//The duty cycle and the energy consumption of the radio is printed out
-	print_duty_cycle(pow_info_actual);
 	set_energy_cons_radio(&energy_cons_data, pow_info_actual);
 	radio_energy_cons_print(energy_cons_data);
 
 	//The usage and the energy consumption of the CPU is printed out
-	print_cpu_usage(pow_info_actual);
+	
 	set_energy_cons_ucontr(&energy_cons_data,pow_info_actual);
 	energy_cons_cpu_print(energy_cons_data);
 
@@ -190,7 +189,11 @@ while(i<9) {
 	//The energy consumption of the pollution sensor is printed out
 	set_energy_pollution_sens(&energy_cons_data, pollution_data.time_sensing);
 	energy_pollution_sens_print(energy_cons_data);
+	
 	printf("\n");
+	print_cpu_usage(pow_info_actual);
+	print_duty_cycle(pow_info_actual);	
+	sum_up_energy_cons(energy_cons_data);
 
 }
 
