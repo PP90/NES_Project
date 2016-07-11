@@ -1,30 +1,6 @@
 /*
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
+ 
+
  */
 
 #include "contiki.h"
@@ -78,6 +54,7 @@ collect_common_net_print(void)
 void
 collect_common_send(void)
 {
+	//It should be implemented the polling request in order to receive the data in a different order than periodic
   /* Server never sends */
 }
 /*---------------------------------------------------------------------------*/
@@ -91,7 +68,9 @@ collect_common_net_init(void)
 
 /*---------------------------------------------------------------------------*/
 
-
+/*
+The field about power consumption are set. 
+*/
 void set_data_pow_cons(uint8_t i, unsigned long pow_cons_data, struct pow_tracking_info_actual *pow_info_actual){
 
 	switch(i){
@@ -120,6 +99,11 @@ void set_data_pow_cons(uint8_t i, unsigned long pow_cons_data, struct pow_tracki
 	}
 }
 
+
+/*
+The field about pollution are set. 
+*/
+
 void set_data_pollution(uint8_t i, uint16_t rec_pollution_data,struct pollution_data *pollution_info){
 
 	switch(i){
@@ -144,8 +128,9 @@ void set_data_pollution(uint8_t i, uint16_t rec_pollution_data,struct pollution_
 	}
 }
 
-/**/
-/*---------------------------------------------------------------------------*/
+/*
+The data coming from the pollution sensors are extracted and putted in the respective data structures.
+*/
 
 
 void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
@@ -157,8 +142,11 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	struct pollution_data pollution_data;
 	struct energy_cons energy_cons_data;
 
-	printf("(#%u)\n",seqno);
-	payload += sizeof(rec_pollution_data)*22;//The read start from 2*8 byte, i.e. after 127 bit (16 byte)
+	printf("(Packet #%u)\n",seqno);
+	//In order to identify which node has sent the packet is necessary to get the MAC address.
+	//FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
+	//The read start from 2*8 byte, i.e. after 127 bit (16 byte). This 16 byte info are related to the WSN it self.
+	payload += sizeof(rec_pollution_data)*22;
 
 //printf("Power consumption data:\n");
 while(i<5) {	
@@ -174,7 +162,6 @@ while(i<5) {
 	radio_energy_cons_print(energy_cons_data);
 
 	//The usage and the energy consumption of the CPU is printed out
-	
 	set_energy_cons_ucontr(&energy_cons_data,pow_info_actual);
 	energy_cons_cpu_print(energy_cons_data);
 
@@ -189,8 +176,8 @@ while(i<9) {
 	//The energy consumption of the pollution sensor is printed out
 	set_energy_pollution_sens(&energy_cons_data, pollution_data.time_sensing);
 	energy_pollution_sens_print(energy_cons_data);
-	
-	printf("\n");
+
+	//It is also printed out the CPU usage, duty cycle and a sum up of energy consumption
 	print_cpu_usage(pow_info_actual);
 	print_duty_cycle(pow_info_actual);	
 	sum_up_energy_cons(energy_cons_data);
@@ -203,12 +190,7 @@ extract_data
 (uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
 
-
-
-//FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
 	uint16_t data;
-	uint16_t data2;
-	uint16_t data3;
 	int i;
 
 	payload += sizeof(data)*12;
@@ -227,21 +209,21 @@ extract_data
 static void
 tcpip_handler(void)
 {
-	
-  uint8_t *appdata;
-  linkaddr_t sender;
-  uint8_t seqno;
-  uint8_t hops;
+	//sender and hops are not used at all.
+	uint8_t *appdata;
+	linkaddr_t sender;
+	uint8_t seqno;
+	uint8_t hops;
 
-  if(uip_newdata()) {
-    appdata = (uint8_t *)uip_appdata;
-    sender.u8[0] = UIP_IP_BUF->srcipaddr.u8[15];
-    sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
-    seqno = *appdata;
-    hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;
-	extract_data2(seqno, appdata + 2, uip_datalen() - 2);
-    //collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
-  }
+	if(uip_newdata()) {
+		appdata = (uint8_t *)uip_appdata;
+		sender.u8[0] = UIP_IP_BUF->srcipaddr.u8[15];
+ 		sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
+		hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;
+		seqno = *appdata;
+		extract_data2(seqno, appdata + 2, uip_datalen() - 2);
+		//collect_common_recv(&sender, seqno, hops, appdata + 2, uip_datalen() - 2);
+  	}
 }
 /*---------------------------------------------------------------------------*/
 static void

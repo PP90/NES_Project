@@ -1,3 +1,6 @@
+/*
+This file containts all power consumption values used for the energy consumption profiling.
+*/
 #ifndef POW_CONS_VALUES_H 
 #define POW_CONS_VALUES_H 7654
 
@@ -10,9 +13,7 @@
 
 
 //RADIO MODULE CC2420 802.15.4 POWER CONSUMPTION VALUES
-
 #define CC2420_SUPPLY 3//V
-
 #define CC2420_TX 19*CC2420_SUPPLY//mA*V=mW
 #define CC2420_RX 17*CC2420_SUPPLY//mA*V=mW
 #define CC2420_IDLE 43*CC2420_SUPPLY//uA*V=uW

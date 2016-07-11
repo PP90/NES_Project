@@ -1,5 +1,5 @@
 /*
-
+This source code has to be upload on the sensor pollution.
  */
 
 #include "contiki.h"
@@ -67,6 +67,7 @@ static void
 tcpip_handler(void)
 {
   if(uip_newdata()) {
+	//It should be implemented in case of polling request coming from the sink node. Not mandatory.
     /* Ignore incoming data */
   }
 }
@@ -74,24 +75,30 @@ tcpip_handler(void)
 void
 collect_common_send(void)
 {
-  static uint8_t seqno;
-  struct {
-    uint8_t seqno;
-    uint8_t for_alignment;
-    struct collect_view_data_msg msg;
-	unsigned long cpu;
-	unsigned long lpm;
-	//the sum is the radio time
-	unsigned long idle_listen;	
-	unsigned long listen;
-	unsigned long transmit;
-		
-	uint16_t co2;
-	uint16_t co;
-	uint16_t temp;
-	uint16_t time_sensing;
+  static uint8_t seqno; //sequence number
 
-} msg;
+	//Todo: These three data structure should be put into the msg data structure. 
+	struct pollution_data pollution_data_sensed;
+	struct pow_tracking_info_all pow_info_all;
+	struct pow_tracking_info_actual pow_info_actual;
+
+	struct {
+		uint8_t seqno;
+		uint8_t for_alignment;
+		struct collect_view_data_msg msg;
+		unsigned long cpu;
+		unsigned long lpm;
+
+		unsigned long idle_listen;	
+		unsigned long listen;
+		unsigned long transmit;
+		
+		uint16_t co2;
+		uint16_t co;
+		uint16_t temp;
+		uint16_t time_sensing;
+
+	}msg;
 	
   /* struct collect_neighbor *n; */
   uint16_t parent_etx;
@@ -106,6 +113,7 @@ collect_common_send(void)
     /* Not setup yet */
     return;
   }
+
   memset(&msg, 0, sizeof(msg));
   seqno++;
   if(seqno == 0) {
@@ -141,20 +149,17 @@ collect_common_send(void)
   }
 
   /* num_neighbors = collect_neighbor_list_num(&tc.neighbor_list); */
-  collect_view_construct_message(&msg.msg, &parent,
-                                 parent_etx, rtmetric,
-                                 num_neighbors, beacon_interval);
+	collect_view_construct_message(&msg.msg, &parent, parent_etx, rtmetric, num_neighbors, beacon_interval);
 
-	struct pollution_data pollution_data_sensed;
+	//Setting the data structure fields
 	pollution_sensing(&pollution_data_sensed);
-	print_pollution_values(pollution_data_sensed);
-
-	struct pow_tracking_info_all pow_info_all;
-	struct pow_tracking_info_actual pow_info_actual;
-
 	power_tracing(&pow_info_all, &pow_info_actual);
-	print_actual_pow(pow_info_actual);
 
+	//Debug prints of power and pollution values
+	print_actual_pow(pow_info_actual);
+	print_pollution_values(pollution_data_sensed);
+	
+	//Setting the msg fields	
 	msg.cpu=pow_info_actual.cpu;
 	msg.lpm=pow_info_actual.lpm;
 	
@@ -162,13 +167,12 @@ collect_common_send(void)
 	msg.listen=pow_info_actual.listen;
 	msg.transmit=pow_info_actual.transmit;
 		
-
 	msg.co2=pollution_data_sensed.co2;
 	msg.co=pollution_data_sensed.co;	
 	msg.temp=pollution_data_sensed.temp;
 	msg.time_sensing=pollution_data_sensed.time_sensing;
 
-  uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+	uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -220,6 +224,7 @@ set_global_address(void)
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(udp_client_process, ev, data)
 {
+	//Warming up phase: the client obtain an ipv6 address and it estabilishes a connection with the server
   PROCESS_BEGIN();
 
   PROCESS_PAUSE();
@@ -239,6 +244,7 @@ PROCESS_THREAD(udp_client_process, ev, data)
   PRINTF(" local/remote port %u/%u\n",
         UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
 
+	//Steady state phase: after to have established a connection with the server, the node is listening for incoming messages
   while(1) {
     PROCESS_YIELD();
     if(ev == tcpip_event) {
