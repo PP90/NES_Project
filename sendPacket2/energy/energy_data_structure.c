@@ -18,10 +18,10 @@ unsigned long energy_cons_cpu(struct energy_cons energy_cons_data){
 }
 
 /*
-Return the overall energy consumption of the radio. It is expressed in mJ.
+Return the overall energy consumption of the radio. It is expressed in uJ.
 */
 unsigned long energy_cons_radio(struct energy_cons energy_cons_data){
-	return energy_cons_data.transmit+energy_cons_data.listen;
+	return energy_cons_data.transmit+energy_cons_data.listen+energy_cons_data.sleep;
 }
 
 /*
@@ -40,18 +40,18 @@ unsigned long energy_cons_pollution_peak(struct energy_cons energy_cons_data){
 
 
 /*
-Return the overall energy consumption of the sensor node in low power mode. It is expressed in mJ.
+Return the overall energy consumption of the sensor node in low power mode. It is expressed in uJ.
 */
 unsigned long total_energy_cons_low(struct energy_cons energy_cons_data){
-	return energy_cons_cpu(energy_cons_data)+energy_cons_radio(energy_cons_data)+energy_cons_pollution_low(energy_cons_data);
+	return energy_cons_cpu(energy_cons_data)+energy_cons_radio(energy_cons_data)+energy_cons_pollution_low(energy_cons_data)*1000;
 
 }
 
 /*
-Return the overall energy consumption of the sensor node in peak power mode. It is expressed in mJ.
+Return the overall energy consumption of the sensor node in peak power mode. It is expressed in uJ.
 */
 unsigned long total_energy_cons_peak(struct energy_cons energy_cons_data){
-	return energy_cons_cpu(energy_cons_data)+energy_cons_radio(energy_cons_data)+energy_cons_pollution_peak(energy_cons_data);
+	return energy_cons_cpu(energy_cons_data)+energy_cons_radio(energy_cons_data)+energy_cons_pollution_peak(energy_cons_data)*1000;
 
 }
 
@@ -67,6 +67,7 @@ return pow_cons*time_ticks/NUM_TICKS_IN_ONE_SECOND;//W*s=J
 /*
 This function prints out all the information about the energy consumption of the node.
 */
+//TO BE FIXED CAUSE GIVE STRANGE VALUES
 void sum_up_energy_cons(struct energy_cons energy_cons_data){
 
 	unsigned long tot_energy_cons_low=total_energy_cons_low(energy_cons_data);
@@ -75,11 +76,11 @@ void sum_up_energy_cons(struct energy_cons energy_cons_data){
 	printf("\n");
 	printf("Tot CPU:%lu uJ (Min:%lu%%)\t(Max%lu%%) \n",tot_cpu_energy_cons, tot_cpu_energy_cons*100/tot_energy_cons_peak, tot_cpu_energy_cons*100/tot_energy_cons_low);
 
-	printf("Tot radio: %lu mJ.\t(Min %lu%%)\t(Max %lu%%)\n",energy_cons_radio(energy_cons_data), energy_cons_radio(energy_cons_data)*100/	tot_energy_cons_peak,  energy_cons_radio(energy_cons_data)*100/tot_energy_cons_low);	
+	printf("Tot radio: %lu uJ.\t(Min %lu%%)\t(Max %lu%%)\n",energy_cons_radio(energy_cons_data), energy_cons_radio(energy_cons_data)*100/	tot_energy_cons_peak,  energy_cons_radio(energy_cons_data)*100/tot_energy_cons_low);	
 
-	printf("Tot pollution: (low %lu mJ %lu%%)\t(Peak %lu mJ %lu%%)\n", energy_cons_pollution_low(energy_cons_data),energy_cons_pollution_low(energy_cons_data)*100/ tot_energy_cons_low,energy_cons_pollution_peak(energy_cons_data),energy_cons_pollution_peak(energy_cons_data)*100/ tot_energy_cons_peak);
+	printf("Tot pollution: (low %lu mJ %lu%%)\t(Peak %lu mJ %lu%%)\n", energy_cons_pollution_low(energy_cons_data),energy_cons_pollution_low(energy_cons_data)*100*1000/ tot_energy_cons_low,energy_cons_pollution_peak(energy_cons_data),energy_cons_pollution_peak(energy_cons_data)*100*1000/ tot_energy_cons_peak);
 
-	printf("Tot energy cons:(low %lu mJ)\t(Peak %lu mJ)\n",tot_energy_cons_low, tot_energy_cons_peak);
+	printf("Tot energy cons:(low %lu mJ)\t(Peak %lu mJ)\n",tot_energy_cons_low/1000, tot_energy_cons_peak/1000);
 }
 
 
@@ -124,25 +125,26 @@ void set_energy_cons_ucontr(struct energy_cons *energy_cons_data, struct pow_tra
 This function prints the energy consumption values about CPU.
 */
 void energy_cons_cpu_print(struct energy_cons energy_cons_data){
-	printf("(CPU_ACTIVE) %lu uJ\n",energy_cons_data.cpu);
-	printf("(CPU_IDLE) %lu uJ\n",energy_cons_data.lpm);
+	printf("[Cpu_active] %lu uJ\n",energy_cons_data.cpu);
+	printf("[Cpu_idle] %lu uJ\n",energy_cons_data.lpm);
 }
 
 
 /*
 This function sets the energy consumption values about the radio module.
-//listen energy consumption: mV*1000*s=uJ
-//idle listen energy consumption: mV*1000*s=uJ
-//transmit energy consumption: mV*1000*s=uJ
-//idle energy consumption: uV*s=uJ
+//Listen energy consumption: mV*1000*s=uJ
+//Idle listen energy consumption: mV*1000*s=uJ
+//Transmit energy consumption: mV*1000*s=uJ
+//Sleep energy consumption: uV*s=uJ
 */
 void set_energy_cons_radio(struct energy_cons *energy_cons_data, struct pow_tracking_info_actual pow_info_actual){
-        
-	unsigned long idle_radio=pow_info_actual.cpu+pow_info_actual.lpm-pow_info_actual.listen-pow_info_actual.transmit;
+        //Total time - listen_time - transmit time = sleep time of the radio
+	unsigned long sleep_radio=pow_info_actual.cpu+pow_info_actual.lpm-pow_info_actual.listen-pow_info_actual.transmit;
+
 	energy_cons_data->listen=energy_cons(CC2420_RX, pow_info_actual.listen*1000);
 	energy_cons_data->idle_listen=energy_cons(CC2420_RX, pow_info_actual.idle_listen*1000);
-	energy_cons_data->transmit=energy_cons(CC2420_RX, pow_info_actual.transmit*1000);
-	energy_cons_data->lpm=energy_cons(CC2420_IDLE, idle_radio);
+	energy_cons_data->transmit=energy_cons(CC2420_TX, pow_info_actual.transmit*1000);
+	energy_cons_data->sleep=energy_cons(CC2420_SLEEP, sleep_radio);
 }
 
 /*
@@ -150,10 +152,11 @@ This function prints the energy consumption values about the radio module.
 */
 void radio_energy_cons_print(struct energy_cons energy_cons_data){
 	printf("Radio energy consumption:\n");
-	printf("(Rx_idle) %lu uJ\n",energy_cons_data.idle_listen);
-	printf("(Rx) %lu uJ\n",energy_cons_data.listen);
-	printf("(Tx)%lu uJ\n",energy_cons_data.transmit);
-	printf("(Idle)%lu uJ\n",energy_cons_data.lpm);
+	printf("[Rx_idle] %lu uJ\n",energy_cons_data.idle_listen);
+	printf("[Rx] %lu uJ\n",energy_cons_data.listen);
+	printf("[Rx wasted:%lu%%]\n",energy_cons_data.idle_listen*100/energy_cons_data.listen);
+	printf("[Tx]%lu uJ\n",energy_cons_data.transmit);
+	printf("[Sleep]%lu uJ\n",energy_cons_data.sleep);
 }
 
 #endif

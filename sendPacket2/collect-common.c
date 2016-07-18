@@ -18,7 +18,7 @@ static unsigned long time_offset;
 static int send_active = 1;
 
 #ifndef PERIOD
-#define PERIOD 10
+#define PERIOD 360
 #endif
 #define RANDWAIT (PERIOD)
 
@@ -127,7 +127,7 @@ PROCESS_THREAD(collect_common_process, ev, data)
     if(ev == PROCESS_EVENT_TIMER) {
       if(data == &period_timer) {
         etimer_reset(&period_timer);
-        etimer_set(&wait_timer, random_rand() % (CLOCK_SECOND * RANDWAIT));//Todo: To be changed because apparently the packet is send at random interval 
+        etimer_set(&wait_timer, PERIOD);
       } else if(data == &wait_timer) {
         if(send_active) {
           /* Time to send the data */

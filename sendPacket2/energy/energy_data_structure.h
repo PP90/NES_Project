@@ -11,6 +11,7 @@ unsigned long lpm;
 unsigned long transmit;
 unsigned long listen;
 unsigned long idle_listen;
+unsigned long sleep;
 
 //pollution energy cons
 unsigned long co;

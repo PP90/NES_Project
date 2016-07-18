@@ -25,7 +25,8 @@ pollution_sensing(struct pollution_data *pollution_data_sensed){
 	SENSORS_DEACTIVATE(ds1000);
 	//clock_time_t t2=clock_time();
 	//pollution_data_sensed->time_sensing=t2-t1;
-	pollution_data_sensed->time_sensing=2+random_rand()/30000;//RANDOM BETWEEN 2 AND 4
+	//pollution_data_sensed->time_sensing=2+random_rand()/30000;//RANDOM BETWEEN 2 AND 4
+	pollution_data_sensed->time_sensing=2;//I assume, for now, that is 2 sec fixed, but it can be change
 	//printf("delta_t: %lu\n",pollution_data_sensed->time_sensing);
 
 }

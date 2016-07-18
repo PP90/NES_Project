@@ -67,6 +67,10 @@
 #undef SICSLOWPAN_CONF_FRAG
 #define SICSLOWPAN_CONF_FRAG           0
 
+/* The channel check rate is given in Hz, specifying the number of channel checks per second, and the default channel check rate is 8 Hz*/
+#undef NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE
+#define NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE 1024
+
 #if WITH_NON_STORING
 #undef RPL_NS_CONF_LINK_NUM
 #define RPL_NS_CONF_LINK_NUM 40 /* Number of links maintained at the root. Can be set to 0 at non-root nodes. */
