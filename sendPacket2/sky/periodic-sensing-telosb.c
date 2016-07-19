@@ -19,20 +19,23 @@ AUTOSTART_PROCESSES(&myProcess);
 /*---------------------------------------------------------------------------*/
 static struct etimer et;
 static struct sensed_data data_acquired;
-
+static uint8_t i;
 PROCESS_THREAD(myProcess, ev, data)
 {
-
-  PROCESS_BEGIN();
-  etimer_set(&et, CLOCK_SECOND*HOW_OFTEN);
-  while(1) {
-    PROCESS_WAIT_EVENT();
-	if(etimer_expired(&et)){
-		leds_toggle(LEDS_ALL);
-		SENSORS_ACTIVATE(light_sensor);
-		SENSORS_ACTIVATE(sht11_sensor);
-		sense_data(&data_acquired);
-		print_data(data_acquired);
+	
+	PROCESS_BEGIN();
+	etimer_set(&et, CLOCK_SECOND*HOW_OFTEN);
+	i=0;
+	while(1) {
+		PROCESS_WAIT_EVENT();
+		if(etimer_expired(&et)){
+			leds_toggle(LEDS_ALL);
+			SENSORS_ACTIVATE(light_sensor);
+			SENSORS_ACTIVATE(sht11_sensor);
+			sense_data(&data_acquired);
+			i+=i;
+			printf("#%u\n",i);
+			print_data(data_acquired);
 
 		//printf("Total consumed: %u\n",  total_energy_consumed());
 		SENSORS_DEACTIVATE(sht11_sensor);

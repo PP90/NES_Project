@@ -28,7 +28,7 @@ This file containts all power consumption values used for the energy consumption
 
 //CO2 SENSOR
 #define CO2_SENSOR_LOW 25*5//(mA*V)=mW
-#define CO2_SENSOR_PEAK 125*POLLUTION_SENSOR_SUPPLY//(mA*V)=mW
+#define CO2_SENSOR_PEAK 125*5//(mA*V)=mW
 
 //TEMP SENSOR
 #define HEAT_DISSIPATION_CONSTANT 35//(mW/°C) to be multiplied by the °C sensed
