@@ -5,8 +5,6 @@
 #include "contiki.h"
 #include <stdio.h> 
 #include "DS1000.h"
-
-#include "confPollution.h"
 #include "pollution-data-structure.c"
 
 void print_values();
@@ -28,7 +26,7 @@ PROCESS_THREAD(ds1000_test, ev, data)
 	
 	while (1){
 		
-		etimer_set(&et, CLOCK_SECOND * HOW_OFTEN_POLLUTION);
+		etimer_set(&et, CLOCK_SECOND * 3);
 		PROCESS_WAIT_UNTIL(etimer_expired(&et));
 		pollution_sensing(&poll_data_acquired);
 		print_pollution_values(poll_data_acquired);

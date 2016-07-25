@@ -36,6 +36,7 @@
 #define UDP_SERVER_PORT 5688
 
 static struct uip_udp_conn *server_conn;
+static struct pollution_data pollution_data_old;
 
 PROCESS(udp_server_process, "UDP server process");
 AUTOSTART_PROCESSES(&udp_server_process,&collect_common_process);
@@ -69,7 +70,7 @@ collect_common_net_init(void)
 /*---------------------------------------------------------------------------*/
 
 /*
-The field about power consumption are set. 
+The field about power consumptions are set. 
 */
 void set_data_pow_cons(uint8_t i, unsigned long pow_cons_data, struct pow_tracking_info_actual *pow_info_actual){
 
@@ -133,6 +134,7 @@ The data coming from the pollution sensors are extracted and putted in the respe
 */
 
 
+
 void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 {
 	uint8_t i=0;
@@ -141,22 +143,20 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	struct pow_tracking_info_actual pow_info_actual;
 	struct pollution_data pollution_data;
 	struct energy_cons energy_cons_data;
+	
+	printf("Packet #%u from node # %u\n",seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1]);
+	//The MAC address can be hardcoded in the IP address, then the IP address can be used as identifier. TODO
 
-	printf("(Packet #%u)\n",seqno);
-	//In order to identify which node has sent the packet is necessary to get the MAC address.
-	//FOR THE MAC ADDRESS SEE THIS LINK: https://sourceforge.net/p/contiki/mailman/message/28166309/
 	//The read start from 2*8 byte, i.e. after 127 bit (16 byte). This 16 byte info are related to the WSN it self.
 	payload += sizeof(rec_pollution_data)*22;
 
-//printf("Power consumption data:\n");
-while(i<5) {	
-	memcpy(&pow_cons_data, payload, sizeof(pow_cons_data));
-	
-    payload += sizeof(pow_cons_data);//Shift of 32 bit (4 byte)
-	set_data_pow_cons(i, pow_cons_data, &pow_info_actual);
-	//printf(" %lu", pow_cons_data);
-	i++;
-  }
+	while(i<5) {	
+		memcpy(&pow_cons_data, payload, sizeof(pow_cons_data));
+		payload += sizeof(pow_cons_data);//Shift of 32 bit (4 byte)
+		set_data_pow_cons(i, pow_cons_data, &pow_info_actual);
+		i++;
+  	}
+
 	//The duty cycle and the energy consumption of the radio is printed out
 	set_energy_cons_radio(&energy_cons_data, pow_info_actual);
 	radio_energy_cons_print(energy_cons_data);
@@ -165,14 +165,16 @@ while(i<5) {
 	set_energy_cons_ucontr(&energy_cons_data,pow_info_actual);
 	energy_cons_cpu_print(energy_cons_data);
 
-//printf("Pollution data:\n");
-while(i<9) {
-	memcpy(&rec_pollution_data, payload, sizeof(rec_pollution_data));
-    payload += sizeof(rec_pollution_data);//Shift of 16 bit
-	set_data_pollution(i, rec_pollution_data,&pollution_data);
-	//printf(" %u", pollution_data);
-	i++;
-  }
+	while(i<9) {
+		memcpy(&rec_pollution_data, payload, sizeof(rec_pollution_data));
+    		payload += sizeof(rec_pollution_data);//Shift of 16 bit
+		set_data_pollution(i, rec_pollution_data,&pollution_data);
+		i++;
+  	}
+
+	print_alarm(alarm(pollution_data_old, pollution_data));
+	pollution_data_old=pollution_data;
+
 	//The energy consumption of the pollution sensor is printed out
 	set_energy_pollution_sens(&energy_cons_data, pollution_data.time_sensing);
 	energy_pollution_sens_print(energy_cons_data);
@@ -217,6 +219,7 @@ tcpip_handler(void)
 
 	if(uip_newdata()) {
 		appdata = (uint8_t *)uip_appdata;
+		
 		sender.u8[0] = UIP_IP_BUF->srcipaddr.u8[15];
  		sender.u8[1] = UIP_IP_BUF->srcipaddr.u8[14];
 		hops = uip_ds6_if.cur_hop_limit - UIP_IP_BUF->ttl + 1;

@@ -1,5 +1,5 @@
 /*
-This source code is used in order to collect periodically data and send it to a specific destinator.
+This source code is used in order to collect periodically data and send it to a specific destination.
 
  */
 
@@ -18,9 +18,8 @@ static unsigned long time_offset;
 static int send_active = 1;
 
 #ifndef PERIOD
-#define PERIOD 360
+#define PERIOD 5
 #endif
-#define RANDWAIT (PERIOD)
 
 /*---------------------------------------------------------------------------*/
 PROCESS(collect_common_process, "collect common process");
@@ -83,7 +82,7 @@ PROCESS_THREAD(collect_common_process, ev, data)
 
   collect_common_net_init();
 
-  /* Send a packet every 5 seconds. */
+  /* Send a packet every PERIOD seconds. */
   etimer_set(&period_timer, CLOCK_SECOND * PERIOD);
   while(1) {
     PROCESS_WAIT_EVENT();

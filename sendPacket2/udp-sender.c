@@ -27,6 +27,7 @@ This source code has to be upload on the sensor pollution.
 #include "pollution/pollution-data-structure.c"
 #include "power/pow_cons_sensor.c"
 #include "node-id.h"
+#include "dev/leds.h"
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -48,6 +49,7 @@ collect_common_net_print(void)
   rpl_dag_t *dag;
   uip_ds6_route_t *r;
 
+	
   /* Let's suppose we have only one instance */
   dag = rpl_get_any_dag();
   if(dag->preferred_parent != NULL) {
@@ -152,28 +154,31 @@ collect_common_send(void)
 	collect_view_construct_message(&msg.msg, &parent, parent_etx, rtmetric, num_neighbors, beacon_interval);
 
 	//Setting the data structure fields
-	pollution_sensing(&pollution_data_sensed);
-	power_tracing(&pow_info_all, &pow_info_actual);
 
-	//Debug prints of power and pollution values
-	print_actual_pow(pow_info_actual);
-	print_pollution_values(pollution_data_sensed);
+ 		pollution_sensing(&pollution_data_sensed);
+		power_tracing(&pow_info_all, &pow_info_actual);
 	
-	//Setting the msg fields	
-	msg.cpu=pow_info_actual.cpu;
-	msg.lpm=pow_info_actual.lpm;
+
+		//Debug prints of power and pollution values
+		print_actual_pow(pow_info_actual);
+		print_pollution_values(pollution_data_sensed);
 	
-	msg.idle_listen=pow_info_actual.idle_listen;
-	msg.listen=pow_info_actual.listen;
-	msg.transmit=pow_info_actual.transmit;
+		//Setting the msg fields	
+		msg.cpu=pow_info_actual.cpu;
+		msg.lpm=pow_info_actual.lpm;
+	
+		msg.idle_listen=pow_info_actual.idle_listen;
+		msg.listen=pow_info_actual.listen;
+		msg.transmit=pow_info_actual.transmit;
 		
-	msg.co2=pollution_data_sensed.co2;
-	msg.co=pollution_data_sensed.co;	
-	msg.temp=pollution_data_sensed.temp;
-	msg.time_sensing=pollution_data_sensed.time_sensing;
+		msg.co2=pollution_data_sensed.co2;
+		msg.co=pollution_data_sensed.co;	
+		msg.temp=pollution_data_sensed.temp;
+		msg.time_sensing=pollution_data_sensed.time_sensing;
 
-	uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
-}
+		uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+	
+} 
 
 /*---------------------------------------------------------------------------*/
 void
@@ -230,6 +235,7 @@ PROCESS_THREAD(udp_client_process, ev, data)
   PROCESS_PAUSE();
 
   set_global_address();
+clock_init();
 
   PRINTF("UDP client process started\n");
 
