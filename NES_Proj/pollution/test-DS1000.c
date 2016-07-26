@@ -1,7 +1,3 @@
- /**
- 
-
- */
 #include "contiki.h"
 #include <stdio.h> 
 #include "DS1000.h"

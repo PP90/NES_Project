@@ -2,7 +2,7 @@
 #define ENERGY_CONS_H 3424
 struct energy_cons{
 
-uint16_t time_sensing;
+unsigned long time_sensing;
 //cpu energy cons
 unsigned long cpu;
 unsigned long lpm;
