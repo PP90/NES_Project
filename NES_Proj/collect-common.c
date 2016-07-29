@@ -18,7 +18,7 @@ static unsigned long time_offset;
 static int send_active = 1;
 
 #ifndef PERIOD
-#define PERIOD 45
+#define PERIOD 10
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -86,43 +86,6 @@ PROCESS_THREAD(collect_common_process, ev, data)
   etimer_set(&period_timer, CLOCK_SECOND * PERIOD);
   while(1) {
     PROCESS_WAIT_EVENT();
-    if(ev == serial_line_event_message) {//Network managment reasons
-      char *line;
-      line = (char *)data;
-      if(strncmp(line, "collect", 7) == 0 ||
-         strncmp(line, "gw", 2) == 0) {
-        collect_common_set_sink();
-      } else if(strncmp(line, "net", 3) == 0) {
-        collect_common_net_print();
-      } else if(strncmp(line, "time ", 5) == 0) {
-        unsigned long tmp;
-        line += 6;
-        while(*line == ' ') {
-          line++;
-        }
-        tmp = strtolong(line);
-        time_offset = clock_seconds() - tmp;
-        printf("Time offset set to %lu\n", time_offset);
-      } else if(strncmp(line, "mac ", 4) == 0) {
-        line +=4;
-        while(*line == ' ') {
-          line++;
-        }
-        if(*line == '0') {
-          NETSTACK_RDC.off(1);
-          printf("mac: turned MAC off (keeping radio on): %s\n", NETSTACK_RDC.name);
-        } else {
-          NETSTACK_RDC.on();
-          printf("mac: turned MAC on: %s\n", NETSTACK_RDC.name);
-        }
-
-      } else if(strncmp(line, "~K", 2) == 0 ||
-                strncmp(line, "killall", 7) == 0) {
-        /* Ignore stop commands */
-      } else {
-        printf("unhandled command: %s\n", line);
-      }
-    }
     if(ev == PROCESS_EVENT_TIMER) {
       if(data == &period_timer) {
         etimer_reset(&period_timer);

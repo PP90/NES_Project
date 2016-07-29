@@ -1,6 +1,6 @@
 CONTIKI=/home/user/contiki
 APPS = powertrace collect-view
-CONTIKI_PROJECT = udp-sender udp-sink
+CONTIKI_PROJECT = udp-sender udp-sink udp-server
 PROJECT_SOURCEFILES += collect-common.c
 
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"

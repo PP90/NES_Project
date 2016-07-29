@@ -23,11 +23,14 @@ This source code has to be upload on the sensor pollution.
 #define UDP_SERVER_PORT 5688
 
 #define DEBUG DEBUG_PRINT
+#define POLLUTION_SENSORS
+
 #include "net/ip/uip-debug.h"
 #include "pollution/pollution-data-structure.c"
 #include "power/pow_cons_sensor.c"
 #include "node-id.h"
 #include "dev/leds.h"
+
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -74,6 +77,74 @@ tcpip_handler(void)
   }
 }
 /*---------------------------------------------------------------------------*/
+static void
+print_pollution_values(struct pollution_data pollution_data_sensed){
+	printf("Co2:%u,Temp:%u,CO:%u\n", \
+  pollution_data_sensed.co, \
+  pollution_data_sensed.co2, \
+  pollution_data_sensed.temp); 
+}
+
+
+/*Alarm function: This function can return one and only one of these following values: 0,1,2,3,4,5,6,7*/
+
+static uint8_t
+alarm(struct pollution_data pollution_data_old, struct pollution_data pollution_data_new)
+{	
+	uint8_t alarm_value=NO_THRESHOLD_EXCEED;
+
+	if((pollution_data_new.co2-pollution_data_old.co2)>=THRESHOLD_CO2) alarm_value+=CO2_EXCEED;
+	if((pollution_data_new.co-pollution_data_old.co)>=THRESHOLD_CO) alarm_value+=CO_EXCEED;
+	if((pollution_data_new.temp-pollution_data_old.temp)>=THRESHOLD_TEMP) alarm_value+=TEMP_EXCEED;
+
+	return alarm_value;
+}
+
+void
+print_alarm(uint8_t alarm_value){
+	switch(alarm_value){
+	case NO_THRESHOLD_EXCEED:
+	printf("No alarm\n");
+	break;
+
+	case CO2_EXCEED:
+	printf("CO2 beyond the threshold\n");
+	break;
+
+	case CO_EXCEED:
+	printf("CO beyond the threshold\n");
+	break;
+
+	case CO2_EXCEED+CO_EXCEED:
+	printf("CO2 and CO beyond the thresholds\n");
+	break;
+
+	case TEMP_EXCEED:
+	printf("TEMP beyond the threshold\n");
+	break;
+
+	case CO2_EXCEED+TEMP_EXCEED:
+	printf("CO2 and temp the thresholds\n");
+	break;
+
+	case CO_EXCEED+TEMP_EXCEED:
+	printf("CO and temp the thresholds\n");
+	break;
+
+	case  CO2_EXCEED+CO_EXCEED+TEMP_EXCEED:
+	printf("CO, CO2 and temp the thresholds\n");
+	break;
+
+	default:
+	printf("Not predicted value\n");
+	break;
+}
+
+}
+
+
+
+
 void
 collect_common_send(void)
 {
@@ -160,7 +231,7 @@ collect_common_send(void)
 	
 
 		//Debug prints of power and pollution values
-		print_actual_pow(pow_info_actual);
+		//print_actual_pow(pow_info_actual);
 		print_pollution_values(pollution_data_sensed);
 	
 		//Setting the msg fields	
@@ -175,7 +246,6 @@ collect_common_send(void)
 		msg.co=pollution_data_sensed.co;	
 		msg.temp=pollution_data_sensed.temp;
 		msg.time_sensing=pollution_data_sensed.time_sensing;
-
 		uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 	
 } 

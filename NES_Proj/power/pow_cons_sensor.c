@@ -38,17 +38,6 @@ unsigned long all_idle_transmit;
 unsigned long all_idle_listen;
 };
 
-
-void pow_tracking_info_actual_init(struct pow_tracking_info_all *pow_info_all){
-	pow_info_all->seqno=0;
-	pow_info_all->all_cpu=0;
-	pow_info_all->all_lpm=0;
-	pow_info_all->all_transmit=0;
-	pow_info_all->all_listen=0;
-	pow_info_all->all_idle_transmit=0;
-	pow_info_all->all_idle_listen=0;
-}
-
 //TO NOT DELETE CAUSE PRINT THE INFO
 /*
 void
@@ -91,34 +80,44 @@ CPU %lu\nLPM %lu\ntransmit %lu\nlisten %lu\nidleTransmit %lu\nidleListen %lu\n\
 /*
 This function prints out the duty cycle. 
 */
+
+
+/*
 void print_duty_cycle(struct pow_tracking_info_actual pow_info_actual){
 	unsigned long time=pow_info_actual.cpu + pow_info_actual.lpm;
 	unsigned long radio=pow_info_actual.transmit + pow_info_actual.listen;
-	printf("Duty cycle:  %d.%02d%% (Period:%lu ms)\n", (int)((100L * radio) / time),
-	(int)((10000L * radio / time) - (100L *radio/ time) * 100),1000*time/NUM_TICKS_IN_ONE_SECOND);
+	printf("Duty cycle:  %d.%02d%%\n", (int)((100L * radio) / time),
+	(int)((10000L * radio / time) - (100L *radio/ time) * 100));
 }
 
-/*
-This function prints out the CPU usage. 
 */
+
+//This function prints out the CPU usage. 
+
+/*
 void print_cpu_usage(struct pow_tracking_info_actual pow_info_actual){
 	unsigned long time=pow_info_actual.cpu + pow_info_actual.lpm;
 	printf("Cpu usage:  %d.%02d%%\n", (int)((100L * pow_info_actual.cpu) / time),
 	(int)((10000L * pow_info_actual.cpu / time) - (100L *pow_info_actual.cpu/ time) * 100));
 }
+*/
 
 /*
 This function prints out the time ticks of the CPU (when it is active and not) and of the radio.
 */
+
+/*
 void print_actual_pow(struct pow_tracking_info_actual pow_info_actual){
 	printf("(CPU) (LPM) Time:(%lu)(%lu) %lu\n",pow_info_actual.cpu, pow_info_actual.lpm, pow_info_actual.cpu+pow_info_actual.lpm);
-	printf("(IDLE_LISTEN) (TOT_LISTEN) (TX) radio_time:(%lu) (%lu) (%lu) %lu\n",pow_info_actual.idle_listen, pow_info_actual.listen, pow_info_actual.transmit, pow_info_actual.listen+pow_info_actual.transmit);
+	printf("(IDLE_RX) (TOT_RX) (TX) radio_time:(%lu) (%lu) (%lu) %lu\n",pow_info_actual.idle_listen, pow_info_actual.listen, pow_info_actual.transmit, pow_info_actual.listen+pow_info_actual.transmit);
 
 }
+*/
 
 /*
 This function computes through the power trace the time of the various components of the sensor node.
 */
+
 void
 power_tracing(struct pow_tracking_info_all *pow_info_all,  struct pow_tracking_info_actual *pow_info_actual)
 {
