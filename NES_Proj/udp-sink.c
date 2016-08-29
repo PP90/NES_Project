@@ -33,6 +33,10 @@
 #define UDP_CLIENT_PORT 8775
 #define UDP_SERVER_PORT 5688
 
+#define DEBUG_PRINT_ENERGY 1
+#define PRINT_ALARM_POLLUTION 0
+#define PRINT_DATA_FOR_CLOUD 0
+
 static struct uip_udp_conn *server_conn;
 static struct pollution_data pollution_data_old;
 
@@ -130,6 +134,8 @@ The data coming from the pollution sensors are extracted and putted in the respe
 */
 
 /*
+Get the SRC Ipv6 address
+*/
 void 
 print_receiver_ipv6_address(void){
 	uint8_t j=0;
@@ -140,7 +146,7 @@ print_receiver_ipv6_address(void){
 	}
 	printf("\n");
 }
-*/
+
 
 void
 print_data_ser_port(uint8_t num_pkt, uint8_t node_id, struct pollution_data pollution_data){
@@ -157,7 +163,7 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	struct pow_tracking_info_actual pow_info_actual;
 	struct pollution_data pollution_data;
 	struct energy_cons energy_cons_data;
-	//printf("Pkt #%u from node # %u\n",seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1]);
+	printf("Pkt #%u from node # %u\n",seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1]);
 	//print_receiver_ipv6_address();
 	
 
@@ -171,13 +177,10 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 		i++;
   	}
 
-	//The duty cycle and the energy consumption of the radio is printed out
+	//The duty cycle and the energy consumption of the radio and CPU are set
 	set_energy_cons_radio(&energy_cons_data, pow_info_actual);
-	//radio_energy_cons_print(energy_cons_data);
-
-	//The usage and the energy consumption of the CPU is printed out
 	set_energy_cons_ucontr(&energy_cons_data,pow_info_actual);
-	//energy_cons_cpu_print(energy_cons_data);
+
 
 	while(i<9) {
 		memcpy(&rec_pollution_data, payload, sizeof(rec_pollution_data));
@@ -186,18 +189,26 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 		i++;
   	}
 
-	//print_alarm(alarm(pollution_data_old, pollution_data));//Alarm function. 
+	
 	pollution_data_old=pollution_data;
-
-	//The energy consumption of the pollution sensor is printed out
 	set_energy_pollution_sens(&energy_cons_data, pollution_data.time_sensing);
-	//energy_pollution_sens_print(energy_cons_data);
+	
 
-	//It is also printed out the CPU usage, duty cycle and a sum up of energy consumption
-	//print_cpu_usage(pow_info_actual);
-	//print_duty_cycle(pow_info_actual);	
-	//sum_up_energy_cons(energy_cons_data);
-	print_data_ser_port(seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1],pollution_data);
+	/*It is printed out: 
+	the radio, CPU and pollution sensor energy consumption
+	 duty cycle, CPU usage
+	a sum un of energy consumption*/
+	if (DEBUG_PRINT_ENERGY==1){
+	radio_energy_cons_print(energy_cons_data);
+	energy_cons_cpu_print(energy_cons_data);
+	energy_pollution_sens_print(energy_cons_data);
+	print_cpu_usage(pow_info_actual);
+	print_duty_cycle(pow_info_actual);	
+	sum_up_energy_cons(energy_cons_data);
+	}
+
+	if(PRINT_ALARM_POLLUTION==1) print_alarm(alarm(pollution_data_old, pollution_data));//Alarm function. 
+	if(PRINT_DATA_FOR_CLOUD==1) print_data_ser_port(seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1],pollution_data);
 }
 
 /*

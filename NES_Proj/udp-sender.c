@@ -246,6 +246,9 @@ collect_common_send(void)
 		msg.co=pollution_data_sensed.co;	
 		msg.temp=pollution_data_sensed.temp;
 		msg.time_sensing=pollution_data_sensed.time_sensing;
+		//printf("The size of the msg is %u bytes\n", sizeof(msg));
+		
+		printf("The values of clock_second is %d\n",CLOCK_SECOND);
 		uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 	
 } 

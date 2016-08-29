@@ -67,7 +67,7 @@ return pow_cons*time_ticks/NUM_TICKS_IN_ONE_SECOND;//W*s=J
 /*
 This function prints out all the information about the energy consumption of the node.
 */
-/*
+
 void sum_up_energy_cons(struct energy_cons energy_cons_data){
 
 	unsigned long tot_energy_cons_low=total_energy_cons_low(energy_cons_data);
@@ -100,7 +100,7 @@ void set_energy_pollution_sens(struct energy_cons *energy_cons_data, unsigned lo
 /*
 This function prints the energy consumption values about pollution sensor.
 */
-/*
+
 void energy_pollution_sens_print(struct energy_cons energy_cons_data){
 	printf("Pollution sensor energy consumption:\n");
 	printf("Time sensing: %lu ms\n",energy_cons_data.time_sensing);//Expressed in ms
@@ -125,7 +125,7 @@ void set_energy_cons_ucontr(struct energy_cons *energy_cons_data, struct pow_tra
 /*
 This function prints the energy consumption values about CPU.
 */
-/*
+
 void energy_cons_cpu_print(struct energy_cons energy_cons_data){
 	printf("[Cpu_active] %lu uJ\n",energy_cons_data.cpu);
 	printf("[Cpu_idle] %lu uJ\n",energy_cons_data.lpm);
@@ -152,7 +152,7 @@ void set_energy_cons_radio(struct energy_cons *energy_cons_data, struct pow_trac
 /*
 This function prints the energy consumption values about the radio module.
 */
-/*
+
 void radio_energy_cons_print(struct energy_cons energy_cons_data){
 	printf("\nRadio E.C.:\n");
 	printf("[Rx_idle] %lu uJ\n",energy_cons_data.idle_listen);
@@ -161,6 +161,6 @@ void radio_energy_cons_print(struct energy_cons energy_cons_data){
 	printf("[Tx]%lu uJ\n",energy_cons_data.transmit);
 	printf("[Sleep]%lu uJ\n",energy_cons_data.sleep);
 }
-*/
+
 #endif
 

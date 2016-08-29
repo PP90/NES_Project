@@ -18,7 +18,7 @@ static unsigned long time_offset;
 static int send_active = 1;
 
 #ifndef PERIOD
-#define PERIOD 10
+#define PERIOD 120
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -79,11 +79,11 @@ PROCESS_THREAD(collect_common_process, ev, data)
 {
   static struct etimer period_timer, wait_timer;
   PROCESS_BEGIN();
-
+	unsigned short seed=20;
   collect_common_net_init();
-
-  /* Send a packet every PERIOD seconds. */
-  etimer_set(&period_timer, CLOCK_SECOND * PERIOD);
+  random_init(seed);
+  /* Send a packet every PERIOD + rand(0,1) seconds. */
+  etimer_set(&period_timer, CLOCK_SECOND * PERIOD+random_rand()/512);//CLOCK SECOND IS EQUAL TO 128, i.e. one clock is equal to 7.8 ms
   while(1) {
     PROCESS_WAIT_EVENT();
     if(ev == PROCESS_EVENT_TIMER) {

@@ -3,16 +3,15 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 def connect_to_drive_and_open_gspread():
+'''This function permits to connect to the spreadsheet file in the cloud and returns it'''
 	scope = ['https://spreadsheets.google.com/feeds']
-
 	credentials = ServiceAccountCredentials.from_json_keyfile_name('pollution-6561beaef0c0.json', scope)
-
 	gc = gspread.authorize(credentials)
-	
 	wks = gc.open("Pollution").sheet1
 	return wks
 
 def parsed_output(serial_output):
+'''This function parses the serial output from the serial port. It returns 0 in case of "too large" output'''
 	output=serial_output.split(';')
 	output=output[0]
 	output=output.split(',')
@@ -33,7 +32,7 @@ def is_written(cell):
 	return 1
 
 
-ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser = serial.Serial('/dev/ttyUSB0', 115200)#USB port and baudrate
 wks=connect_to_drive_and_open_gspread()
 
 starting_row=5;
@@ -45,7 +44,7 @@ col_CO2='E';
 col_temp='F';
 row=starting_row;
 while True:
-	line = line = ser.readline() 
+	line = ser.readline() 
 	node_id,pkt_number,temp,co,co2=parsed_output(line)
 	print node_id,pkt_number,temp,co,co2
 	write_cell(wks, col_nodeID+str(row), node_id)
