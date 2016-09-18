@@ -15,17 +15,16 @@ PROCESS_THREAD(ds1000_test, ev, data)
 
 	static struct etimer et;
 	static struct pollution_data poll_data_acquired;
-
-	SENSORS_ACTIVATE(ds1000);
-  	printf ("SENSORS_ACTIVATE: %d\n",ds1000.status(SENSORS_ACTIVE));
-	printf ("SENSORS_READY: %d\n",ds1000.status(SENSORS_READY));
-	
+	rtimer_init ();
+  	
+	/*In one second the are 32768 ticks of rtimer*/
 	while (1){
-		
-		etimer_set(&et, CLOCK_SECOND * 3);
+		etimer_set(&et, CLOCK_SECOND * 30);
 		PROCESS_WAIT_UNTIL(etimer_expired(&et));
+		//printf("RTIMER_SECOND:%d\n",RTIMER_SECOND);
+
 		pollution_sensing(&poll_data_acquired);
-		print_pollution_values(poll_data_acquired);
+		 print_pollution_values_raw(poll_data_acquired);
 		}
 
   PROCESS_END();

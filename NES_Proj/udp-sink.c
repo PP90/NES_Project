@@ -33,9 +33,11 @@
 #define UDP_CLIENT_PORT 8775
 #define UDP_SERVER_PORT 5688
 
-#define DEBUG_PRINT_ENERGY 1
-#define PRINT_ALARM_POLLUTION 0
-#define PRINT_DATA_FOR_CLOUD 0
+/*If it is set to one, it prints the complete report of energy consumption*/
+#define DEBUG_PRINT_ENERGY 0
+
+/*If it is set to one, print the data in cloud-format, i.e. ready to be parsed and uploaded on cloud by the  python code in this folder*/
+#define PRINT_DATA_FOR_CLOUD 1
 
 static struct uip_udp_conn *server_conn;
 static struct pollution_data pollution_data_old;
@@ -207,7 +209,6 @@ void extract_data2(uint8_t seqno, uint8_t *payload, uint16_t payload_len)
 	sum_up_energy_cons(energy_cons_data);
 	}
 
-	if(PRINT_ALARM_POLLUTION==1) print_alarm(alarm(pollution_data_old, pollution_data));//Alarm function. 
 	if(PRINT_DATA_FOR_CLOUD==1) print_data_ser_port(seqno, UIP_IP_BUF->srcipaddr.u8[sizeof(UIP_IP_BUF->srcipaddr.u8) - 1],pollution_data);
 }
 

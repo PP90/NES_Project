@@ -87,7 +87,7 @@ print_pollution_values(struct pollution_data pollution_data_sensed){
 
 
 /*Alarm function: This function can return one and only one of these following values: 0,1,2,3,4,5,6,7*/
-
+/*Actually it is not used, but it can be used for future works*/
 static uint8_t
 alarm(struct pollution_data pollution_data_old, struct pollution_data pollution_data_new)
 {	
@@ -248,7 +248,7 @@ collect_common_send(void)
 		msg.time_sensing=pollution_data_sensed.time_sensing;
 		//printf("The size of the msg is %u bytes\n", sizeof(msg));
 		
-		printf("The values of clock_second is %d\n",CLOCK_SECOND);
+		//printf("The values of clock_second is %d\n",CLOCK_SECOND);
 		uip_udp_packet_sendto(client_conn, &msg, sizeof(msg), &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 	
 } 

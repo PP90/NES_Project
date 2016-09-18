@@ -1,0 +1,31 @@
+As you can see in this directory there are a lot of files and folders.
+Here below a little explanation what each folder and file is\contains.
+
+-----------
+Directories:
+
+1. The "energy" directory contains the data structure and the functions used to handle the energy consumption data of a air-quality sensor of CO and CO2. This sensor node has also a radio and the energy consumption of a radio is take into consideration as well.
+
+2. The "pollution" directory folder contains the data structure and the functions used to handle the pollution data. Moreover, the test-DS1000.c file is a test source code.
+
+3. The "power" directory contains the data structure and the functions used to handle the power consumption data and values. In particular, the powertrace library has been included in order to compute the radio and cpu timing. 
+
+--------------------------------------
+
+Files:
+
+1. Collect-common.c and collect-common.h containts the source code to send periodically the data from the sender to the sink. The process collect common is called from the udp-sender.c source code.
+
+2. getAndUploadPollutionData.py It is a python snippet by which is possibile to read the data from the USB port in which the sink is connected (in my case is tty/USB0, but it is changable). After reading the data from USB port, the data is parsed and then the CO, CO2 and temp values are upload on a Google Spreadsheet cloud. In order to do this, you need also the authorization. The info about authorization are stored in the json file.
+
+3. Makefile is the makefile, nothing to say.
+
+4. project-conf.h contains the configuration of Radio Duty Cycle (RDC) and other network parameters.
+
+5. Readme is this file.
+
+6. udp-sender.c and udp-sink.c are the source code of the cluster node and the cluster head respectively.
+
+7. Util commands contains the command to compile and load the source code on the sky platform.
+
+

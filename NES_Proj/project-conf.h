@@ -50,7 +50,7 @@
 #undef NETSTACK_CONF_RDC
 #define NETSTACK_CONF_RDC     contikimac_driver//HERE CAN BE DECIDED THE MAC PROTOCOL
 #undef NULLRDC_CONF_802154_AUTOACK
-#define NULLRDC_CONF_802154_AUTOACK       1//Todo. What is it ?
+#define NULLRDC_CONF_802154_AUTOACK       1
 
 /* Define as minutes */
 #define RPL_CONF_DEFAULT_LIFETIME_UNIT   60
@@ -69,7 +69,7 @@
 
 /* The channel check rate is given in Hz, specifying the number of channel checks per second, and the default channel check rate is 8 Hz*/
 #undef NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE
-#define NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE 4
+#define NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE 8
 
 #if WITH_NON_STORING
 #undef RPL_NS_CONF_LINK_NUM

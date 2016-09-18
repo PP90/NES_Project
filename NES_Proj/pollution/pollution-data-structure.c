@@ -4,35 +4,31 @@
 #include "DS1000.h"
 #include "pollution_data_structure.h"
 
-#define THRESHOLD_CO 100
-#define THRESHOLD_CO2 300
-#define THRESHOLD_TEMP 5
-
-#define NO_THRESHOLD_EXCEED 0
-#define CO2_EXCEED 1
-#define CO_EXCEED 2
-#define TEMP_EXCEED 4
-
-
-#ifdef POLLUTION_SENSORS
-static void
+void
 pollution_sensing(struct pollution_data *pollution_data_sensed){
 	
-	//clock_time_t t1=clock_time();	
-	//leds_on (unsigned char leds);
-	SENSORS_ACTIVATE(ds1000);	
+	uint16_t t1=RTIMER_NOW();
+	
+	SENSORS_ACTIVATE(ds1000);
+	/*It must be wait 90 sec due to warming up time TODO*/
+	printf ("SENSORS_ACTIVATE: %d\n",ds1000.status(SENSORS_ACTIVE));
+	printf ("SENSORS_READY: %d\n",ds1000.status(SENSORS_READY));	
 	pollution_data_sensed->co=ds1000.value(SENSOR_CO);
 	pollution_data_sensed->co2=ds1000.value(SENSOR_CO2);
-	pollution_data_sensed->temp=ds1000.value(SENSOR_TEMP);//TO BE CONVERTED IN CELSIUS DEGREE
+	pollution_data_sensed->temp=ds1000.value(SENSOR_TEMP);
 	SENSORS_DEACTIVATE(ds1000);
-	//clock_time_t t2=clock_time();
-	
-	pollution_data_sensed->time_sensing=20;//Expressed in ms
-	//pollution_data_sensed->time_sensing=t2-t1;	
-	//printf("delta_t: %lu\n",pollution_data_sensed->time_sensing);
+	uint16_t t2=RTIMER_NOW();
+	printf ("SENSORS_READY: %d\n",ds1000.status(SENSORS_READY));	
+	pollution_data_sensed->time_sensing=t2-t1;	
 
 }
 
-#endif
+void print_pollution_values_raw(struct pollution_data poll_data_acquired){
+	printf("Not calibrated values\n");
+	printf("CO2:%u ppm\n",poll_data_acquired.co2);
+	printf("CO:%u ppm\n",poll_data_acquired.co);
+	printf("Time sensing:%u Ticks of Rtimer\n",poll_data_acquired.time_sensing);
+}
+
 
 #endif

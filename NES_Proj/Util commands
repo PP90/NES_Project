@@ -1,0 +1,12 @@
+To compile the source code for sky platflom:
+sudo make MOTE=1 TARGET=sky name_prog.c
+
+To upload the executable code on sky platflom:
+sudo make MOTE=1 TARGET=sky name_prog.upload
+
+To login in the device:
+sudo make login
+
+In case of problems:
+sudo chmod 777 dev/tty/USB0
+
